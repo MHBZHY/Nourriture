@@ -127,7 +127,7 @@ function Routing() {
         
         //访问web主页
         app.get('/', urlEncodedParser, function (req, res) {
-            
+            res.send('Hello World!');
         });
     };
 }
