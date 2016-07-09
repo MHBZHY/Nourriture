@@ -40,6 +40,6 @@ app.set('view engine', 'html');
 app.set('views', __dirname + '/Public/view');
 
 //启动服务器
-app.listen('8088', function () {
+app.listen(8088, function () {
     console.log('Server started at 8088');
 });

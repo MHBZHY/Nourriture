@@ -62,7 +62,7 @@ function Menu() {
 		
 		connection.query(sql, function (err, rows) {
 			if (err) {
-				res.send(0);
+				res.send('0');
 				return;
 			}
 			
@@ -104,7 +104,7 @@ function Menu() {
 		
 		connection.query(sql, function (err) {
 			if (err) {
-				res.send(0);
+				res.send('0');
 				return;
 			}
 			

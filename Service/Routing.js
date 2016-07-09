@@ -17,7 +17,7 @@ function Routing() {
         //phone: string
         //password: string(md5 or sha1)
         app.post('/login', urlEncodedParser, function (req, res) {
-	        if (req.body.deviceId) {
+	        if (req.body.device_id) {
 		        //用户登录
 		        service.userLogin(req, res);
 	        }
@@ -29,19 +29,13 @@ function Routing() {
 
         //注册
         app.post('/register', urlEncodedParser, function (req, res) {
-            switch (req.body.type) {
-                case 'user':
-                    //用户注册
-                    service.userRegister(req, res);
-                    break;
-                
-                case 'restaurant':
-                    //餐厅注册
-                    service.restaurantRegister(req, res);
-                    break;
-                
-                default:
-                    break;
+            if (req.body.device_id) {
+                //用户注册
+                service.userRegister(req, res);
+            }
+            else {
+                //餐厅注册
+                service.restaurantRegister(req, res);
             }
         });
         
@@ -116,19 +110,25 @@ function Routing() {
         app.post('/friend_in_bound', urlEncodedParser, function (req, res) {
             service.friendInBound(req, res);
         });
-        
+
         //获取一定范围内用户(所有用户)位置
         app.post('/user_in_bound', urlEncodedParser, function (req, res) {
             service.userInBound(req, res);
         });
-        
+
         //创建订单
         
         
         //访问web主页
         app.get('/', urlEncodedParser, function (req, res) {
-            res.send('Hello World!');
+            res.render('index');
         });
+
+        app.get('/test', urlEncodedParser, function (req, res) {
+            res.render('test', {
+                //ejs
+            })
+        })
     };
 }
 

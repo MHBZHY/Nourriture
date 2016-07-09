@@ -12,15 +12,15 @@ function Service() {
 	//用户登录
 	this.userLogin = function (req, res) {
 		//搜索用户名称
-		user.searchByPhone(req.body.phone,  res,  function (rows) {
+		user.getPasswordByAccount(req.body.account, res,  function (rows) {
 			if (rows[0].password != req.body.password) {
-				res.send(-2);   //-2: password error
+				res.send('-2');   //-2: password error
 				return;
 			}
 			
 			//将设备与用户绑定
-			user.bindWithDevice(req.body.deviceId, res, function () {
-				res.send(1);
+			user.bindWithDevice(req.body.deviceId, rows[0].id, res, function () {
+				res.send('1');
 			});
 		})
 	};
@@ -28,30 +28,30 @@ function Service() {
 	//商户登陆
 	this.restaurantLogin = function (req, res) {
 		//搜索商户
-		restaurant.searchByPhone(req.body.phone, res, function (rows) {
+		restaurant.getPasswordByAccount(req.body.account, res, function (rows) {
 			if (rows[0].password != req.body.password) {
-				res.send(-2);   //password incorrect
+				res.send('-2');   //password incorrect
 				return;
 			}
 
 			//注册session
 			req.session.userId = rows[0].id;
 			//返回成功
-			res.send(1);
+			res.send('1');
 		})
 	};
 
 	//用户注册
 	this.userRegister = function (req, res) {
 		user.add(req, res, function () {
-			res.send(1);    //register success
+			res.send('1');    //register success
 		})
 	};
 
 	//商户注册
 	this.restaurantRegister = function (req, res) {
 		restaurant.add(req, res, function () {
-			res.send(1);    //register success
+			res.send('1');    //register success
 		})
 	};
 
@@ -59,18 +59,18 @@ function Service() {
 	this.logout = function (req, res) {
 		//deviceId存在
 		if (req.body.deviceId != undefined) {
-			user.logout(req, res, function () {
-				res.send(1);
+			user.logout(req.body.deviceId, res, function () {
+				res.send('1');
 			})
 		}
 		//不存在
 		else {
 			restaurant.logout(req, function () {
 				if (req.session.sessionID == undefined) {
-					res.send(1);
+					res.send('1');
 				}
 				else {
-					res.send(0);
+					res.send('0');
 				}
 			})
 		}
@@ -81,7 +81,7 @@ function Service() {
 		//搜索id
 		user.searchByDeviceId(req.body.deviceId, res, function (rows) {
 			//根据id返回信息
-			user.searchById(rows[0].id, res, function (rows) {
+			user.getPasswordByAccount(rows[0].id, res, function (rows) {
 				res.send(rows);
 			})
 		});
@@ -89,15 +89,15 @@ function Service() {
 
 	//获取商户信息
 	this.restaurantInfo = function (req, res) {
-		restaurant.searchById(req.session.userId, res, function (rows) {
+		restaurant.getPasswordByAccount(req.session.userId, res, function (rows) {
 			res.send(rows);
 		})
 	};
 
 	//更新用户信息
 	this.userUpdate = function (req, res) {
-		user.update(req.body.deviceId, res, function () {
-			res.send(1);
+		user.update(req, res, function () {
+			res.send('1');
 		})
 	};
 
@@ -125,21 +125,21 @@ function Service() {
 	//上传菜单
 	this.menuUpload = function (req, res) {
 		menu.add(req, res, function () {
-			res.send(1);
+			res.send('1');
 		})
 	};
 
 	//修改菜单
 	this.menuUpdate = function (req, res) {
 		menu.updateById(req.body.id, res, function () {
-			res.send(1);
+			res.send('1');
 		})
 	};
 
 	//点评菜单
 	this.menuEvaluate = function (req, res) {
 		menu.evaluate(req.body.id, res, function () {
-			res.send(1);
+			res.send('1');
 		})
 	};
 
@@ -152,7 +152,7 @@ function Service() {
 	
 	//按号查找用户
 	this.userById = function (req, res) {
-		user.searchById(req.body.id, res, function (rows) {
+		user.getInfoByAccount(req.body.account, res, function (rows) {
 			res.send(rows);
 		})
 	};
@@ -181,7 +181,7 @@ function Service() {
 	//创建订单
 	this.orderCreate = function (req, res) {
 		order.add(req, res, function () {
-			res.send(1);
+			res.send('1');
 		})
 	};
 
@@ -191,14 +191,14 @@ function Service() {
 			case 0:
 				//订单完成付款
 				order.finish(req.body.id, res, function () {
-					res.send(1);
+					res.send('1');
 				});
 				break;
 
 			case 1:
 				//订单被取消
 				order.cancel(req.body.id, res, function () {
-					res.send(1);
+					res.send('1');
 				});
 				break;
 

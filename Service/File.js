@@ -7,11 +7,11 @@ function File() {
 	var fs = require('fs');
 
 	var uploadPath = path.join(__dirname, '../Public/upload');
-	var tempUploadPath = path.join(__dirname, '../Public/temp_upload');
+	var tempUploadPath = path.join(__dirname, '../Public/tempUpload');
 
 	this.parse = function (req, res, callBack) {
 		//初始化multiparty对象
-		var form = multiparty.Form({uploadDir: tempUploadPath});
+		var form = new multiparty.Form({uploadDir: tempUploadPath});
 
 		//解析二进制表单
 		form.parse(req, function (err, fields, files) {
@@ -27,20 +27,24 @@ function File() {
 
 	this.move = function (oldPath, newPath, fileName, res, callBack) {
 		//判断用户目录
-		if (!fs.existsSync(newPath)) {
+		if (!fs.existsSync(uploadPath + newPath)) {
 			//无则创建
-			fs.mkdirSync(newPath);
+			fs.mkdirSync(uploadPath + newPath);
 		}
 
 		fs.rename(oldPath, uploadPath + newPath + fileName, function (err) {
 			if (err) {
-				res.send(0);
+				res.send('0');
 				return;
 			}
 			
 			callBack();
 		})
-	}
+	};
+	
+	this.getFileType = function (fileName) {
+		return path.extname(fileName);
+	};
 }
 
 module.exports = new File();
