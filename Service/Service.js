@@ -12,14 +12,14 @@ function Service() {
 	//用户登录
 	this.userLogin = function (req, res) {
 		//搜索用户名称
-		user.getPasswordByAccount(req.body.account, res,  function (rows) {
+		user.getPasswordByAccount(req.body.id, res,  function (rows) {
 			if (rows[0].password != req.body.password) {
 				res.send('-2');   //-2: password error
 				return;
 			}
 			
 			//将设备与用户绑定
-			user.bindWithDevice(req.body.deviceId, rows[0].id, res, function () {
+			user.bindWithDevice(req.body.device_id, rows[0].id, res, function () {
 				res.send('1');
 			});
 		})
@@ -28,7 +28,7 @@ function Service() {
 	//商户登陆
 	this.restaurantLogin = function (req, res) {
 		//搜索商户
-		restaurant.getPasswordByAccount(req.body.account, res, function (rows) {
+		restaurant.getPasswordByAccount(req.body.id, res, function (rows) {
 			if (rows[0].password != req.body.password) {
 				res.send('-2');   //password incorrect
 				return;
@@ -58,8 +58,8 @@ function Service() {
 	//注销
 	this.logout = function (req, res) {
 		//deviceId存在
-		if (req.body.deviceId != undefined) {
-			user.logout(req.body.deviceId, res, function () {
+		if (req.body.device_id != undefined) {
+			user.logout(req.body.device_id, res, function () {
 				res.send('1');
 			})
 		}
@@ -79,7 +79,7 @@ function Service() {
 	//获取用户信息
 	this.userInfo = function (req, res) {
 		//搜索id
-		user.searchByDeviceId(req.body.deviceId, res, function (rows) {
+		user.searchByDeviceId(req.body.device_id, res, function (rows) {
 			//根据id返回信息
 			user.getPasswordByAccount(rows[0].id, res, function (rows) {
 				res.send(rows);
@@ -89,7 +89,7 @@ function Service() {
 
 	//获取商户信息
 	this.restaurantInfo = function (req, res) {
-		restaurant.getPasswordByAccount(req.session.userId, res, function (rows) {
+		restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
 			res.send(rows);
 		})
 	};
@@ -152,8 +152,22 @@ function Service() {
 	
 	//按号查找用户
 	this.userById = function (req, res) {
-		user.getInfoByAccount(req.body.account, res, function (rows) {
-			res.send(rows);
+		user.getInfoByAccount(req.body.id, res, function (rows) {
+			res.send(rows[0]);
+		})
+	};
+	
+	//按号查找餐厅
+	this.restaurantById = function (req, res) {
+		restaurant.getInfoByAccount(req.body.id, res, function (rows) {
+			res.send(rows[0]);
+		})
+	};
+	
+	//按名字查找餐厅
+	this.restaurantByName = function (req, res) {
+		restaurant.getInfoByName(req.body.name, res, function (rows) {
+			res.send(rows[0]);
 		})
 	};
 	
@@ -166,7 +180,7 @@ function Service() {
 	
 	//获取附近好友
 	this.friendInBound = function (req, res) {
-		user.friendInBound(req.body.deviceId, req.body.lon, req.body.lat, res, function (rows) {
+		user.friendInBound(req.body.device_id, req.body.lon, req.body.lat, res, function (rows) {
 			res.send(rows);
 		})
 	};

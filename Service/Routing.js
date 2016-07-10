@@ -90,6 +90,19 @@ function Routing() {
             service.menuEvaluate(req, res);
         });
 
+        //获取商户信息
+	    app.post('/restaurant', urlEncodedParser, function (req, res) {
+		    if (req.body.id) {
+			    service.restaurantById(req, res);
+		    }
+			else if (req.body.name) {
+			    service.restaurantByName(req, res);
+		    }
+		    else {
+			    service.restaurantInfo(req, res);
+		    }
+	    });
+
         //获取餐厅搜索建议
         //name: string
         app.post('/restaurant_search', urlEncodedParser, function (req, res) {

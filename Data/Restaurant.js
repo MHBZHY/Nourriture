@@ -35,18 +35,39 @@ function Restaurant() {
 	};
 	
 	this.getInfoByAccount = function (account, res, callBack) {
-		connection.query('SELECT certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
-			'WHERE account = "' + account + '"',
-			function (err, rows) {
-				if (err) {
-					res.send('0');
-					return;
-				}
-				
-				if (callBack != undefined) {
-					callBack(rows)
-				}
-			})
+		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
+			'WHERE account = "' + account + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if (callBack != undefined) {
+				callBack(rows)
+			}
+		})
+	};
+	
+	this.getInfoByName = function (name, res, callBack) {
+		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
+			'WHERE name = "' + name + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if (callBack) {
+				callBack(rows)
+			}
+		})
 	};
 	
 	this.getPasswordByAccount = function (account, res, callBack) {
@@ -87,16 +108,19 @@ function Restaurant() {
 	};
 	
 	this.searchSuggest = function (namePart, res, callBack) {
-		connection.query('SELECT name, account id FROM shop ' +
-			'WHERE name LIKE "' + namePart + '"',
-			function (err, rows) {
-				if (err) {
-					res.send('0');
-					return;
-				}
-				
-				callBack(rows);
-			})
+		var sql = 'SELECT name, account id FROM shop ' +
+			'WHERE name LIKE "%' + namePart + '%"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			callBack(rows);
+		})
 	};
 	
 	this.logout = function (req, callBack) {
