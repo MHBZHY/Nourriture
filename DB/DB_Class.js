@@ -8,8 +8,8 @@ function DB() {
 	// var host = '123.206.64.143';
     var port = '3306';
     var user = 'root';
-    // var password = '248326';
-	var password = '1234root5678';
+    var password = '248326';
+	// var password = '1234root5678';
     var db = 'Nourriture';
     var charset = 'UTF8_BIN';
 
