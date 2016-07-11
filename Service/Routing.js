@@ -132,14 +132,14 @@ function Routing() {
         //创建订单
 
 
-	    //封禁用户
+	    //封禁
 	    app.post('/admin_del', urlEncodedParser, function (req, res) {
-			if (req.body.type == 1) {
-				service.adminForbid(req, res);
-			}
-		    else {
-				service.adminActivate(req, res);
-			}
+			service.adminForbid(req, res);
+	    });
+	    
+	    //激活
+	    app.post('/admin_act', urlEncodedParser, function (req, res) {
+		    service.adminActivate(req, res);
 	    });
         
         

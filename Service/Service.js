@@ -8,7 +8,6 @@ function Service() {
 	var restaurant = require('../Data/Restaurant');
 	var menu = require('../Data/Menu');
 	var order = require('../Data/Order');
-	var admin = require('../Data/Admin');
 
 	//用户登录
 	this.userLogin = function (req, res) {
@@ -90,6 +89,14 @@ function Service() {
 
 	//获取商户信息
 	this.restaurantInfo = function (req, res) {
+		if (!req.session.userId) {
+			restaurant.all(res, function (rows) {
+				res.send(rows);
+			});
+
+			return;
+		}
+		
 		restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
 			res.send(rows);
 		})
@@ -223,15 +230,51 @@ function Service() {
 	};
 	
 	this.adminForbid = function (req, res) {
-		admin.forbidShop(req.body.id, res, function () {
-			res.send('1');
-		})
+		//0: 用户, 1: 商户, 2: 菜品
+		switch (req.body.type) {
+			case 0:
+				user.del(req.body.id, res, function () {
+					res.send('1');
+				});
+				break;
+			
+			case 1:
+				restaurant.del(req.body.id, res, function () {
+					res.send('1');
+				});
+				break;
+			
+			case 2:
+				
+				break;
+			
+			default:
+				break;
+		}
 	};
 	
 	this.adminActivate = function (req, res) {
-		admin.activateShop(req.body.id, res, function () {
-			res.send('1');
-		})
+		//0: 用户, 1: 商户, 2: 菜品
+		switch (req.body.type) {
+			case 0:
+				user.activate(req.body.id, res, function () {
+					res.send('1');
+				});
+				break;
+			
+			case 1:
+				restaurant.activate(req.body.id, res, function () {
+					res.send('1');
+				});
+				break;
+			
+			case 2:
+				
+				break;
+			
+			default:
+				break;
+		}
 	}
 }
 

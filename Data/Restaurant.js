@@ -8,6 +8,19 @@ function Restaurant() {
 	var file = require('../Service/File');
 	var oppositePath = '/Public/upload';
 	
+	this.all = function (res, callBack) {
+		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop';
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			callBack(rows);
+		})
+	};
+	
 	this.add = function (req, res, callBack) {
 		file.parse(req, res, function (fields, files) {
 			var account = '123456';
@@ -120,6 +133,38 @@ function Restaurant() {
 			}
 			
 			callBack(rows);
+		})
+	};
+	
+	this.del = function (account, res, callBack) {
+		var sql = 'UPDATE shop SET del = 1 WHERE account="' + account + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if  (callBack) {
+				callBack();
+			}
+		})
+	};
+	
+	this.activate = function (account, res, callBack) {
+		var sql = 'UPDATE shop SET del = 0 WHERE account="' + account + '"';
+		
+		connection.query(sql, function (err) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if  (callBack) {
+				callBack();
+			}
 		})
 	};
 	

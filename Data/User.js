@@ -176,6 +176,38 @@ function User() {
 		})
 	};
 	
+	this.del = function (account, res, callBack) {
+		var sql = 'UPDATE user SET del = 1 WHERE account="' + account + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if  (callBack) {
+				callBack();
+			}
+		})
+	};
+	
+	this.activate = function (account, res, callBack) {
+		var sql = 'UPDATE user SET del = 0 WHERE account="' + account + '"';
+		
+		connection.query(sql, function (err) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if  (callBack) {
+				callBack();
+			}
+		})
+	};
+	
 	this.logout = function (deviceId, res, callBack) {
 		connection.query('UPDATE user SET device_id = NULL WHERE device_id = "' + deviceId + '"',
 			function (err) {
