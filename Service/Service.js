@@ -8,6 +8,7 @@ function Service() {
 	var restaurant = require('../Data/Restaurant');
 	var menu = require('../Data/Menu');
 	var order = require('../Data/Order');
+	var admin = require('../Data/Admin');
 
 	//用户登录
 	this.userLogin = function (req, res) {
@@ -219,6 +220,18 @@ function Service() {
 			default:
 				break;
 		}
+	};
+	
+	this.adminForbid = function (req, res) {
+		admin.forbidShop(req.body.id, res, function () {
+			res.send('1');
+		})
+	};
+	
+	this.adminActivate = function (req, res) {
+		admin.activateShop(req.body.id, res, function () {
+			res.send('1');
+		})
 	}
 }
 

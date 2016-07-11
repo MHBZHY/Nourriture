@@ -14,7 +14,7 @@ app.use(cookie());
 //设置session
 app.use(session({
     secret: 'Contract',
-    cookie: {maxAge: 15 * 60 * 1000},
+    cookie: {maxAge: 15 * 60 * 1000},   //session timeout: 15 min
     resave: false,
     saveUninitialized: true
 }));

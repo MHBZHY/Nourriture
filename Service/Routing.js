@@ -130,6 +130,17 @@ function Routing() {
         });
 
         //创建订单
+
+
+	    //封禁用户
+	    app.post('/admin_del', urlEncodedParser, function (req, res) {
+			if (req.body.type == 1) {
+				service.adminForbid(req, res);
+			}
+		    else {
+				service.adminActivate(req, res);
+			}
+	    });
         
         
         //访问web主页
