@@ -145,7 +145,7 @@ function Routing() {
         
         //访问web主页
         app.get('/', urlEncodedParser, function (req, res) {
-            res.render('index');
+            res.sendFile(path.join(__dirname, '../Public/view/index.html'));
         });
 
         app.get('/test', urlEncodedParser, function (req, res) {

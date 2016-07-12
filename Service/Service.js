@@ -96,7 +96,7 @@ function Service() {
 
 			return;
 		}
-		
+
 		restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
 			res.send(rows);
 		})
@@ -232,19 +232,19 @@ function Service() {
 	this.adminForbid = function (req, res) {
 		//0: 用户, 1: 商户, 2: 菜品
 		switch (req.body.type) {
-			case 0:
+			case '0':
 				user.del(req.body.id, res, function () {
 					res.send('1');
 				});
 				break;
 			
-			case 1:
+			case '1':
 				restaurant.del(req.body.id, res, function () {
 					res.send('1');
 				});
 				break;
 			
-			case 2:
+			case '2':
 				
 				break;
 			
@@ -256,19 +256,19 @@ function Service() {
 	this.adminActivate = function (req, res) {
 		//0: 用户, 1: 商户, 2: 菜品
 		switch (req.body.type) {
-			case 0:
+			case '0':
 				user.activate(req.body.id, res, function () {
 					res.send('1');
 				});
 				break;
 			
-			case 1:
+			case '1':
 				restaurant.activate(req.body.id, res, function () {
 					res.send('1');
 				});
 				break;
 			
-			case 2:
+			case '2':
 				
 				break;
 			
