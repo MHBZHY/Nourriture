@@ -9,6 +9,7 @@ function Routing() {
     var urlEncodedParser = bodyParser.urlencoded({extended: false});
 	
 	var service = require('./Service');
+	var file = require('./File');
 	
     
     this.parse = function (app) {
@@ -17,25 +18,46 @@ function Routing() {
         //phone: string
         //password: string(md5 or sha1)
         app.post('/login', urlEncodedParser, function (req, res) {
+	        //app
 	        if (req.body.device_id) {
 		        //用户登录
 		        service.userLogin(req, res);
 	        }
+		    //web
 	        else {
-		        //餐厅登陆
-		        service.restaurantLogin(req, res);
+		        if (req.body.isadmin) {
+		            service.admin_login(req, res);
+		        }
+		        else {
+			        //餐厅登陆
+			        service.restaurantLogin(req, res);
+		        }
 	        }
         });
 
         //注册
         app.post('/register', urlEncodedParser, function (req, res) {
-            if (req.body.device_id) {
-                //用户注册
-                service.userRegister(req, res);
+            if (req.headers['content-type'].split(';')[0] == 'multipart/form-data') {
+	            file.parse(req, res, function (fields) {
+		            if (fields.device_id[0]) {
+			            //用户注册
+			            service.userRegister(req, res);
+		            }
+		            else {
+			            //餐厅注册
+			            service.restaurantRegister(req, res);
+		            }
+	            })
             }
-            else {
-                //餐厅注册
-                service.restaurantRegister(req, res);
+	        else {
+	            if (req.body.device_id) {
+		            //用户注册
+		            service.userRegister(req, res);
+	            }
+	            else {
+		            //餐厅注册
+		            service.restaurantRegister(req, res);
+	            }
             }
         });
         
@@ -145,7 +167,9 @@ function Routing() {
         
         //访问web主页
         app.get('/', urlEncodedParser, function (req, res) {
-            res.sendFile(path.join(__dirname, '../Public/view/index.html'));
+            res.render('index', {
+	            
+            });
         });
 
         app.get('/test', urlEncodedParser, function (req, res) {

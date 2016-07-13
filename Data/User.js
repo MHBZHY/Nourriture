@@ -4,7 +4,7 @@
 function User() {
 	var self = this;
 	
-	var connection = require('../DB/DB_Class').getConnection();
+	var connection = require('../DB_Class').getConnection();
 	var file = require('../Service/File');
 	
 	this.add = function (req, res, callBack) {
@@ -33,6 +33,21 @@ function User() {
 						}
 					})
 			})
+		})
+	};
+
+	this.all = function (res, callBack) {
+		var sql = 'SELECT name, account id, password, reg_date, img, phone, birthday, sex FROM user';
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if (callBack) {
+				callBack(rows);
+			}
 		})
 	};
 	
@@ -101,16 +116,35 @@ function User() {
 	};
 	
 	this.getInfoByAccount = function (account, res, callBack) {
-		connection.query('SELECT name, account, img, phone, birthday, sex FROM user ' +
-			'where account="' + account + '"',
-			function (err, rows) {
-				if (err) {
-					res.send('0');
-					return;
-				}
-				
-				callBack(rows);
-			})
+		var sql = 'SELECT name, account, img, phone, birthday, sex FROM user ' +
+			'where account="' + account + '"';
+
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+
+			callBack(rows);
+		})
+	};
+
+	this.getInfoByName = function (name, res, callBack) {
+		var sql = 'SELECT name, account id, img, phone, birthday, sex, longitude, latitude FROM user ' +
+			'where name="' + name + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			callBack(rows);
+		})
 	};
 	
 	this.searchByDeviceId = function (deviceId, res, callBack) {
@@ -187,7 +221,7 @@ function User() {
 				return;
 			}
 			
-			if  (callBack) {
+			if (callBack) {
 				callBack();
 			}
 		})
@@ -195,14 +229,16 @@ function User() {
 	
 	this.activate = function (account, res, callBack) {
 		var sql = 'UPDATE user SET del = 0 WHERE account="' + account + '"';
-		
+
+		console.log(sql);
+
 		connection.query(sql, function (err) {
 			if (err) {
 				res.send('0');
 				return;
 			}
 			
-			if  (callBack) {
+			if (callBack) {
 				callBack();
 			}
 		})
@@ -221,6 +257,29 @@ function User() {
 				}
 			})
 	};
+
+	this.admin = function (name, password, res, callBack) {
+		var sql = 'SELECT * FROM admin ' +
+			'WHERE name="' + name + '" AND password="' + password + '"';
+		
+		console.log(sql);
+		
+		connection.query(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if (rows.length == 0) {
+				res.send('-1');
+				return;
+			}
+			
+			if (callBack) {
+				callBack();
+			}
+		})
+	}
 }
 
 module.exports = new User();

@@ -78,17 +78,38 @@ function Service() {
 
 	//获取用户信息
 	this.userInfo = function (req, res) {
-		//搜索id
-		user.searchByDeviceId(req.body.device_id, res, function (rows) {
-			//根据id返回信息
-			user.getPasswordByAccount(rows[0].id, res, function (rows) {
-				res.send(rows);
-			})
-		});
+		//管理员未登陆
+		if (req.session.admin) {
+			if (req.body.id) {
+				user.getInfoByAccount(req.body.id, res, function (rows) {
+					res.send(rows[0]);
+				})
+			}
+			else if (req.body.name) {
+				user.getInfoByName(req.body.name, res, function (rows) {
+					res.send(rows[0]);
+				})
+			}
+			else {
+				user.all(res, function (rows) {
+					res.send(rows);
+				})
+			}
+		}
+		else {
+			//搜索id
+			user.searchByDeviceId(req.body.device_id, res, function (rows) {
+				//根据id返回信息
+				user.getPasswordByAccount(rows[0].id, res, function (rows) {
+					res.send(rows);
+				})
+			});
+		}
 	};
 
 	//获取商户信息
 	this.restaurantInfo = function (req, res) {
+		//管理员
 		if (!req.session.userId) {
 			restaurant.all(res, function (rows) {
 				res.send(rows);
@@ -111,9 +132,24 @@ function Service() {
 
 	//获取菜单
 	this.menus = function (req, res) {
-		menu.getInBound(req.body.page, req.body.amount, res, function (rows) {
-			res.send(rows);
-		})
+		// if (!req.session.userId) {
+		// 	if (req.body.id) {
+		//
+		// 	}
+		// 	else if (req.body.name) {
+		//
+		// 	}
+		// 	else {
+		// 		menu.all(res, function (rows) {
+		// 			res.send(rows);
+		// 		})
+		// 	}
+		// }
+		// else {
+			menu.getInBound(req.body.page, req.body.amount, res, function (rows) {
+				res.send(rows);
+			})
+		// }
 	};
 
 	//获取用户菜单
@@ -162,6 +198,12 @@ function Service() {
 	this.userById = function (req, res) {
 		user.getInfoByAccount(req.body.id, res, function (rows) {
 			res.send(rows[0]);
+		})
+	};
+
+	this.userByName = function (req, res) {
+		user.getInfoByName(req.body.name, res, function (rows) {
+			res.send(rows);
 		})
 	};
 	
@@ -245,7 +287,9 @@ function Service() {
 				break;
 			
 			case '2':
-				
+				menu.del(req.body.id, req.body.menuType, res, function () {
+					res.send('1');
+				});
 				break;
 			
 			default:
@@ -269,12 +313,21 @@ function Service() {
 				break;
 			
 			case '2':
-				
+				menu.activate(req.body.id, req.body.menuType, res, function () {
+					res.send('1');
+				});
 				break;
 			
 			default:
 				break;
 		}
+	};
+	
+	this.admin_login = function (req, res) {
+		user.admin(req.body.name, req.body.password, res, function () {
+			req.session.admin = 1;
+			res.send('1');
+		})
 	}
 }
 

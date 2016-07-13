@@ -4,7 +4,7 @@
 function Order() {
 	var self = this;
 
-	var connection = require('../DB/DB_Class').getConnection();
+	var connection = require('../DB_Class').getConnection();
 
 	this.add = function (req, res, callBack) {
 		var sql = '';

@@ -4,7 +4,7 @@
 function Restaurant() {
 	var self = this;
 	
-	var connection = require('../DB/DB_Class').getConnection();
+	var connection = require('../DB_Class').getConnection();
 	var file = require('../Service/File');
 	var oppositePath = '/Public/upload';
 	

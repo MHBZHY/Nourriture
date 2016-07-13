@@ -4,7 +4,7 @@
 function Menu() {
 	var self = this;
 	
-	var connection = require('../DB/DB_Class').getConnection();
+	var connection = require('../DB_Class').getConnection();
 
 	//上传菜谱
 	this.add = function (req, res, callBack) {
@@ -35,6 +35,45 @@ function Menu() {
 				callBack()
 			}
 		})
+	};
+
+	this.all = function (res, callBack) {
+		var sql1 = 'SELECT name, img, price, description, type, evaluate FROM `menu-user`, `menu_material-user`, `material-user`' +
+			'WHERE `menu-user`.id = `menu_material-user`.menu_id AND `material-user`.id = `menu_material-user`.material_id';
+
+		console.log(sql1);
+
+		connection.query(sql1, function (err, rows1) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+
+			rows1.forEach(function (row) {
+				row.menuType = 0;
+			});
+
+			var sql2 = 'SELECT id, name, img, price, description, type, evaluate FROM `menu-shop`';
+
+			console.log(sql2);
+
+			connection.query(sql2, function (err, rows2) {
+				if (err) {
+					res.send('0');
+					return;
+				}
+
+				rows2.forEach(function (row) {
+					row.menuType = 1;
+				});
+
+				var rows = rows1.concat(rows2);
+
+				if (callBack) {
+					callBack(rows);
+				}
+			})
+		});
 	};
 	
 	//获取单个菜单
@@ -114,8 +153,18 @@ function Menu() {
 		})
 	};
 	
-	this.del = function (account, res, callBack) {
-		var sql = 'UPDATE menu-shop, menu-user SET del = 1 WHERE account="' + account + '"';
+	this.del = function (account, menuType, res, callBack) {
+		var sql;
+
+		if (menuType == '0') {
+			sql = 'UPDATE `menu-user` SET del = 1 WHERE id=' + account;
+		}
+		else if (menuType == '1') {
+			sql = 'UPDATE `menu-shop` SET del = 1 WHERE id=' + account;
+		}
+		else {
+			res.send('0');
+		}
 		
 		console.log(sql);
 		
@@ -131,8 +180,19 @@ function Menu() {
 		})
 	};
 	
-	this.activate = function (account, res, callBack) {
-		var sql = 'UPDATE user SET del = 0 WHERE account="' + account + '"';
+	this.activate = function (account, menuType, res, callBack) {
+		var sql;
+
+		if (menuType == '0') {
+			sql = 'UPDATE `menu-user` SET del = 0 WHERE id=' + account;
+		}
+		else if (menuType == '1') {
+			sql = 'UPDATE `menu-shop` SET del = 0 WHERE id=' + account;
+		}
+		else {
+			res.send('0');
+			return;
+		}
 		
 		connection.query(sql, function (err) {
 			if (err) {
