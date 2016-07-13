@@ -2,59 +2,105 @@
  * Created by zhy on 16/7/4.
  */
 function Service() {
-	var self = this;
+	// var self = this;
 
 	var user = require('../Data/User');
 	var restaurant = require('../Data/Restaurant');
 	var menu = require('../Data/Menu');
 	var order = require('../Data/Order');
 
-	//用户登录
-	this.userLogin = function (req, res) {
-		//搜索用户名称
-		user.getPasswordByAccount(req.body.id, res,  function (rows) {
-			if (rows[0].password != req.body.password) {
-				res.send('-2');   //-2: password error
-				return;
+	//登陆
+	this.login = function (req, res) {
+		//app
+		if (req.body.device_id) {
+			//用户登录
+			//搜索用户名称
+			user.getPasswordByAccount(req.body.id, res,  function (rows) {
+				if (rows[0].password != req.body.password) {
+					res.send('-2');   //-2: password error
+					return;
+				}
+				
+				//将设备与用户绑定
+				user.bindWithDevice(req.body.device_id, rows[0].id, res, function () {
+					res.send('1');
+				});
+			})
+		}
+		//web
+		else {
+			if (req.body.isadmin) {
+				user.admin(req.body.name, req.body.password, res, function () {
+					req.session.admin = 1;
+					res.send('1');
+				})
 			}
-			
-			//将设备与用户绑定
-			user.bindWithDevice(req.body.device_id, rows[0].id, res, function () {
+			else {
+				//餐厅登陆
+				//搜索商户
+				restaurant.getPasswordByAccount(req.body.id, res, function (rows) {
+					if (rows[0].password != req.body.password) {
+						res.send('-2');   //password incorrect
+						return;
+					}
+					
+					//注册session
+					req.session.userId = rows[0].id;
+					//返回成功
+					res.send('1');
+				})
+			}
+		}
+	};
+	
+
+	//注册
+	this.register = function (req, res) {
+		// if (req.headers['content-type'].split(';')[0] == 'multipart/form-data') {
+		// 	file.parse(req, res, function (err, fields, files) {
+		// 		if (fields.device_id[0]) {
+		// 			//用户注册
+		// 			user.add(fields, files, res, function () {
+		// 				res.send('1');    //register success
+		// 			})
+		// 		}
+		// 		else {
+		// 			//餐厅注册
+		// 			restaurant.add(req, res, function () {
+		// 				res.send('1');    //register success
+		// 			})
+		// 		}
+		// 	})
+		// }
+		// else {
+		// 	if (req.body.device_id) {
+		// 		//用户注册
+		// 		user.add(fields, files, res, function () {
+		// 			res.send('1');    //register success
+		// 		})
+		// 	}
+		// 	else {
+		// 		//餐厅注册
+		// 		restaurant.add(req, res, function () {
+		// 			res.send('1');    //register success
+		// 		})
+		// 	}
+		// }
+		
+		if (req.body.device_id) {
+			//来自app
+			user.add(req, res, function () {
 				res.send('1');
-			});
-		})
+			})
+		}
+		else {
+			//来自web
+			restaurant.add(req, res, function () {
+				res.send('1');
+			})
+		}
 	};
-
-	//商户登陆
-	this.restaurantLogin = function (req, res) {
-		//搜索商户
-		restaurant.getPasswordByAccount(req.body.id, res, function (rows) {
-			if (rows[0].password != req.body.password) {
-				res.send('-2');   //password incorrect
-				return;
-			}
-
-			//注册session
-			req.session.userId = rows[0].id;
-			//返回成功
-			res.send('1');
-		})
-	};
-
-	//用户注册
-	this.userRegister = function (req, res) {
-		user.add(req, res, function () {
-			res.send('1');    //register success
-		})
-	};
-
-	//商户注册
-	this.restaurantRegister = function (req, res) {
-		restaurant.add(req, res, function () {
-			res.send('1');    //register success
-		})
-	};
-
+	
 	//注销
 	this.logout = function (req, res) {
 		//deviceId存在
@@ -106,21 +152,36 @@ function Service() {
 			});
 		}
 	};
-
-	//获取商户信息
+	
+	//获取餐厅信息
 	this.restaurantInfo = function (req, res) {
-		//管理员
-		if (!req.session.userId) {
-			restaurant.all(res, function (rows) {
-				res.send(rows);
-			});
-
-			return;
+		if (req.body.id) {
+			//根据account获取
+			restaurant.getInfoByAccount(req.body.id, res, function (rows) {
+				res.send(rows[0]);
+			})
 		}
-
-		restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
-			res.send(rows);
-		})
+		else if (req.body.name) {
+			//根据name获取
+			restaurant.getInfoByName(req.body.name, res, function (rows) {
+				res.send(rows[0]);
+			})
+		}
+		else {
+			//根据已登陆的餐厅获取数据
+			//管理员
+			if (req.session.admin) {
+				restaurant.all(res, function (rows) {
+					res.send(rows);
+				});
+				
+				return;
+			}
+			
+			restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
+				res.send(rows);
+			})
+		}
 	};
 
 	//更新用户信息
@@ -148,7 +209,7 @@ function Service() {
 		// else {
 			menu.getInBound(req.body.page, req.body.amount, res, function (rows) {
 				res.send(rows);
-			})
+			});
 		// }
 	};
 
@@ -191,33 +252,6 @@ function Service() {
 	this.restaurantSearchSuggest = function (req, res) {
 		restaurant.searchSuggest(req.body.name, res, function (rows) {
 			res.send(rows);
-		})
-	};
-	
-	//按号查找用户
-	this.userById = function (req, res) {
-		user.getInfoByAccount(req.body.id, res, function (rows) {
-			res.send(rows[0]);
-		})
-	};
-
-	this.userByName = function (req, res) {
-		user.getInfoByName(req.body.name, res, function (rows) {
-			res.send(rows);
-		})
-	};
-	
-	//按号查找餐厅
-	this.restaurantById = function (req, res) {
-		restaurant.getInfoByAccount(req.body.id, res, function (rows) {
-			res.send(rows[0]);
-		})
-	};
-	
-	//按名字查找餐厅
-	this.restaurantByName = function (req, res) {
-		restaurant.getInfoByName(req.body.name, res, function (rows) {
-			res.send(rows[0]);
 		})
 	};
 	
@@ -321,13 +355,6 @@ function Service() {
 			default:
 				break;
 		}
-	};
-	
-	this.admin_login = function (req, res) {
-		user.admin(req.body.name, req.body.password, res, function () {
-			req.session.admin = 1;
-			res.send('1');
-		})
 	}
 }
 

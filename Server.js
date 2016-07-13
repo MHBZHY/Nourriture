@@ -13,7 +13,7 @@ app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-    res.header("X-Powered-By",' 3.2.1');
+    // res.header("X-Powered-By",' 3.2.1');
     // res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
@@ -23,7 +23,7 @@ app.use(cookie());
 
 //设置session
 app.use(session({
-    secret: 'Contract',
+    secret: 'Nourriture',
     cookie: {maxAge: 15 * 60 * 1000},   //session timeout: 15 min
     resave: false,
     saveUninitialized: true
@@ -48,6 +48,9 @@ app.use(express.static(__dirname + '/Public'));
 app.engine('.html', require('ejs').__express);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/Public/view');
+
+//设置一些扩展函数
+require('./Service/Tools').stringFormat();
 
 //启动服务器
 app.listen(8088, function () {

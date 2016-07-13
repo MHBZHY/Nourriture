@@ -9,56 +9,20 @@ function Routing() {
     var urlEncodedParser = bodyParser.urlencoded({extended: false});
 	
 	var service = require('./Service');
-	var file = require('./File');
 	
-    
+    //路由解析
     this.parse = function (app) {
-        //post请求
+        //以下为post请求
         //登陆
         //phone: string
         //password: string(md5 or sha1)
         app.post('/login', urlEncodedParser, function (req, res) {
-	        //app
-	        if (req.body.device_id) {
-		        //用户登录
-		        service.userLogin(req, res);
-	        }
-		    //web
-	        else {
-		        if (req.body.isadmin) {
-		            service.admin_login(req, res);
-		        }
-		        else {
-			        //餐厅登陆
-			        service.restaurantLogin(req, res);
-		        }
-	        }
+	        service.login(req, res);
         });
 
         //注册
         app.post('/register', urlEncodedParser, function (req, res) {
-            if (req.headers['content-type'].split(';')[0] == 'multipart/form-data') {
-	            file.parse(req, res, function (fields) {
-		            if (fields.device_id[0]) {
-			            //用户注册
-			            service.userRegister(req, res);
-		            }
-		            else {
-			            //餐厅注册
-			            service.restaurantRegister(req, res);
-		            }
-	            })
-            }
-	        else {
-	            if (req.body.device_id) {
-		            //用户注册
-		            service.userRegister(req, res);
-	            }
-	            else {
-		            //餐厅注册
-		            service.restaurantRegister(req, res);
-	            }
-            }
+            service.register(req, res);
         });
         
         //注销
@@ -114,15 +78,7 @@ function Routing() {
 
         //获取商户信息
 	    app.post('/restaurant', urlEncodedParser, function (req, res) {
-		    if (req.body.id) {
-			    service.restaurantById(req, res);
-		    }
-			else if (req.body.name) {
-			    service.restaurantByName(req, res);
-		    }
-		    else {
-			    service.restaurantInfo(req, res);
-		    }
+		    service.restaurantInfo(req, res);
 	    });
 
         //获取餐厅搜索建议
@@ -164,7 +120,8 @@ function Routing() {
 		    service.adminActivate(req, res);
 	    });
         
-        
+	    
+        //以下为gei请求
         //访问web主页
         app.get('/', urlEncodedParser, function (req, res) {
             res.render('index', {

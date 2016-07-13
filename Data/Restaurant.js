@@ -2,7 +2,7 @@
  * Created by zhy on 16/7/2.
  */
 function Restaurant() {
-	var self = this;
+	// var self = this;
 	
 	var connection = require('../DB_Class').getConnection();
 	var file = require('../Service/File');
@@ -10,6 +10,8 @@ function Restaurant() {
 	
 	this.all = function (res, callBack) {
 		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop';
+		
+		console.log(sql);
 		
 		connection.query(sql, function (err, rows) {
 			if (err) {
@@ -21,16 +23,37 @@ function Restaurant() {
 		})
 	};
 	
+	//注册
 	this.add = function (req, res, callBack) {
 		file.parse(req, res, function (fields, files) {
 			var account = '123456';
-			var imgPath = '/' + account + '/' + 'background' + file.getFileType(files.img[0].originalFilename);
-			var certPath = '/' + account + '/' + 'certificate' + file.getFileType(files.certificate[0].originalFilename);
+			var imgPath = '/shop/{account}/background{name}'.format({
+				account: account,
+				name: file.getFileType(files.img[0].originalFilename)
+			});
+			var certPath = '/shop/{account}/certificate{name}'.format({
+				account: account,
+				name: file.getFileType(files.certificate[0].originalFilename)
+			});
 			
+			//移动文件
 			file.move(files.img[0].path, '/' + account + '/', 'background' + file.getFileType(files.img[0].originalFilename), res, function () {
-				var sql = 'INSERT INTO shop (name, account, password, certificate, address, phone, img, description, ads, longitude, latitude) VALUES ("' +
-					fields.name[0] + '","' + account + '","' + fields.password[0] + '","' + oppositePath + certPath + '","' + fields.address[0] + '","' + fields.phone[0] + '","' +
-					oppositePath + imgPath + '","' + fields.description[0] + '","' + fields.ads[0] + '","' + fields.lon + '","' + fields.lat + '")';
+				var sql = 'INSERT INTO shop(name, account, password, certificate, address, phone, img, description, ads, longitude, latitude) VALUES (' +
+						'"{name}","{account}","{password}","{certificate}","{address}","{phone}","{img}",{description},{ads},"{longitude}","{latitude}")'.format({
+							name: fields.name[0],
+							account: account,
+							password: fields.password[0],
+							certificate: oppositePath + certPath,
+							address: fields.address[0],
+							phone: fields.phone[0],
+							img: oppositePath + imgPath,
+							description: fields.description[0] == undefined ? null : '"' + fields.description[0] + '"',
+							ads: fields.ads[0] == undefined ? null : '"' + fields.ads[0] + '"',
+							longitude: fields.lon,
+							latitude: fields.lat
+						});
+				
+				console.log(sql);
 				
 				connection.query(sql, function (err) {
 					if (err) {
@@ -47,9 +70,12 @@ function Restaurant() {
 		});
 	};
 	
+	//根据account获取信息
 	this.getInfoByAccount = function (account, res, callBack) {
 		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
-			'WHERE account = "' + account + '"';
+			'WHERE account = "{account}"'.format({
+				account: account
+			});
 		
 		console.log(sql);
 		
@@ -65,9 +91,12 @@ function Restaurant() {
 		})
 	};
 	
+	//根据名称获取信息
 	this.getInfoByName = function (name, res, callBack) {
 		var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
-			'WHERE name = "' + name + '"';
+			'WHERE name = "{name}"'.format({
+				name: name
+			});
 		
 		console.log(sql);
 		
@@ -83,9 +112,12 @@ function Restaurant() {
 		})
 	};
 	
+	//根据account获取密码
 	this.getPasswordByAccount = function (account, res, callBack) {
 		var sql = 'SELECT password FROM shop ' +
-			'WHERE account="' + account + '"';
+			'WHERE account="{account}"'.format({
+				account: account
+			});
 		
 		console.log(sql);
 		
@@ -105,8 +137,11 @@ function Restaurant() {
 		})
 	};
 	
+	//范围内获取餐厅
 	this.searchInBound = function (lon, lat, bound, res, callBack) {
 		var sql = '';
+		
+		console.log(sql);
 		
 		connection.query(sql, function (err, rows) {
 			if (err) {
@@ -120,9 +155,12 @@ function Restaurant() {
 		})
 	};
 	
+	//搜索建议(名称)
 	this.searchSuggest = function (namePart, res, callBack) {
 		var sql = 'SELECT name, account id FROM shop ' +
-			'WHERE name LIKE "%' + namePart + '%"';
+			'WHERE name LIKE "%{namePart}%"'.format({
+				namePart: namePart
+			});
 		
 		console.log(sql);
 		
@@ -136,8 +174,11 @@ function Restaurant() {
 		})
 	};
 	
+	//封禁/删除
 	this.del = function (account, res, callBack) {
-		var sql = 'UPDATE shop SET del = 1 WHERE account="' + account + '"';
+		var sql = 'UPDATE shop SET del = 1 WHERE account="{account}"'.format({
+			account: account
+		});
 		
 		console.log(sql);
 		
@@ -153,8 +194,13 @@ function Restaurant() {
 		})
 	};
 	
+	//激活
 	this.activate = function (account, res, callBack) {
-		var sql = 'UPDATE shop SET del = 0 WHERE account="' + account + '"';
+		var sql = 'UPDATE shop SET del = 0 WHERE account="{account}"'.format({
+			account: account
+		});
+		
+		console.log(sql);
 		
 		connection.query(sql, function (err) {
 			if (err) {
@@ -168,6 +214,7 @@ function Restaurant() {
 		})
 	};
 	
+	//注销
 	this.logout = function (req, callBack) {
 		req.session.destroy();
 		callBack();
