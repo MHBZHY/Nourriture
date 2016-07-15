@@ -280,6 +280,27 @@ function User() {
 		})
 	};
 	
+	//获得好友
+	this.friend = function (params, dbDriver, res, callBack) {
+		var sql = 'SELECT @userId:=id FROM user ' +
+			'WHERE device_id={deviceId};'.format({
+				deviceId: params.deviceId
+			}) +
+			'SELECT user.* FROM user, friend ' +
+			'WHERE friend.user_id=@userId AND friend.friend_id=user.id';
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			callBack(rows)
+		})
+	};
+	
 	//范围内查找好友
 	this.friendInBound = function (params, dbDriver, res, callBack) {
 		var sql = '';

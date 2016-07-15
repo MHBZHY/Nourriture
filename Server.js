@@ -37,7 +37,7 @@ app.use(function (req, res, next) {
 });
 
 //orm操作数据库(实验中)
-require('./DB_Orm2').createOrmConnection(app);
+require('./DB_ORM2').createOrmConnection(app);
 
 //静态页面
 app.use(express.static(__dirname + '/Public'));
