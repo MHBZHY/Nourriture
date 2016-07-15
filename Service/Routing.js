@@ -19,8 +19,17 @@ module.exports.parse = function (app) {
 	});
 	
 	//注册
-	app.post('/register', urlEncodedParser, function (req, res) {
-		service.register(req, res);
+	app.post('/user_register', urlEncodedParser, function (req, res) {
+		service.userRegister(req, res)
+	});
+	
+	app.post('/shop_register', urlEncodedParser, function (req, res) {
+		service.shopRegister(req, res)
+	});
+	
+	//用户名是否存在
+	app.post('/register_exist', urlEncodedParser, function (req, res) {
+		service.regNameExist(req, res)
 	});
 	
 	//注销
@@ -39,25 +48,18 @@ module.exports.parse = function (app) {
 	});
 	
 	//获取菜单(附编号范围, ex: 1, 10, 表示1到10编号的菜单)
-	//menu_range: [start: string, end: string]
 	app.post('/menu', urlEncodedParser, function (req, res) {
 		service.menus(req, res);
 	});
 	
 	//获取个人菜单
 	app.post('/menu_self', urlEncodedParser, function (req, res) {
-		service.userMenus(req, res);
-	});
-	
-	//获取菜单详细信息(按照菜单编号)
-	//menu_id: string
-	app.post('/menu_specific', urlEncodedParser, function (req, res) {
-		service.menuInfo(req, res);
+		service.selfMenus(req, res);
 	});
 	
 	//上传菜单
 	app.post('/menu_add', urlEncodedParser, function (req, res) {
-		service.menuUpload(req, res);
+		service.menuAdd(req, res);
 	});
 	
 	//修改菜单
@@ -76,7 +78,7 @@ module.exports.parse = function (app) {
 	
 	//获取商户信息
 	app.post('/restaurant', urlEncodedParser, function (req, res) {
-		service.restaurantInfo(req, res);
+		service.shopInfo(req, res);
 	});
 	
 	//获取餐厅搜索建议

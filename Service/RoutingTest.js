@@ -25,7 +25,7 @@ module.exports.router = function (app) {
 	});
 	
 	app.post('/user_exist', urlEncodedParser, function (req, res) {
-		user.isExist(req.body.name, req.db.driver, res);
+		user.nameIsExist(req.body.name, req.db.driver, res);
 	});
 	
 	app.post('/user_update', urlEncodedParser, function (req, res) {

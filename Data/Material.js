@@ -19,7 +19,7 @@ function Material() {
 			}, function (err, rows) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				//materialId
@@ -41,7 +41,7 @@ function Material() {
 					row.save(function (err) {
 						if (err) {
 							res.send('0');
-							return;
+							return
 						}
 						
 						//与菜单建立关系
@@ -55,7 +55,7 @@ function Material() {
 						// }, function (err) {
 						// 	if (err) {
 						// 		res.send('0');
-						// 		return;
+						// 		return
 						// 	}
 						//
 						// 	res.send('1');
@@ -78,7 +78,7 @@ function Material() {
 			req.models.material.find({ id: fields.id[0] }, function (err, rows) {
 				if (err || rows.length == 0) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				//图片路径
@@ -101,7 +101,7 @@ function Material() {
 					row.save(function (err) {
 						if (err) {
 							res.send('0');
-							return;
+							return
 						}
 						
 						res.send('1');
@@ -123,7 +123,7 @@ function Material() {
 		}).remove(function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			res.send('1');
@@ -142,7 +142,7 @@ function Material() {
 		}, function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			res.send('1');
@@ -158,14 +158,14 @@ function Material() {
 		dbMaterial.find({ id: materialId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -182,14 +182,14 @@ function Material() {
 		dbMaterial.find({ id: materialId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');

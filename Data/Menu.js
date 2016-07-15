@@ -25,7 +25,7 @@ function Menu() {
 			}, function (err, rows) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				//插入时创建的id
@@ -45,7 +45,7 @@ function Menu() {
 					req.models.menu.find({id: menuId}, function (err, rows) {
 						if (err || rows.length == 0) {
 							res.send('0');
-							return;
+							return
 						}
 						
 						//插入路径
@@ -53,7 +53,7 @@ function Menu() {
 						rows[0].save(function (err) {
 							if (err) {
 								res.send('0');
-								return;
+								return
 							}
 							
 							//根据上传者建立关系
@@ -67,7 +67,7 @@ function Menu() {
 									}, function (err) {
 										if (err) {
 											res.send('0');
-											return;
+											return
 										}
 										
 										res.send('1');
@@ -86,7 +86,7 @@ function Menu() {
 								}, function (err) {
 									if (err) {
 										res.send('0');
-										return;
+										return
 									}
 									
 									res.send('1');
@@ -111,7 +111,7 @@ function Menu() {
 		dbMenu.find({ del: 0 }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -123,13 +123,14 @@ function Menu() {
 		dbMenu.find({id: menuId, del: 0 }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
 		})
 	};
 	
+	//获取用户自己的菜单
 	this.getByUser = function (deviceId, dbDriver, res, callBack) {
 		user.getIdByDeviceId(deviceId, dbDriver, res, function (userId) {
 			var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
@@ -140,11 +141,28 @@ function Menu() {
 			dbDriver.execQuery(sql, function (err, rows) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				callBack(rows)
 			})
+		})
+	};
+	
+	//获取餐厅自己的菜单
+	this.getByShop = function (shopId, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0'.format({
+				shopId: shopId
+			});
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
 		})
 	};
 	
@@ -154,7 +172,7 @@ function Menu() {
 		
 		connection.query(sql, function (err, rows) {
 			if (err) {
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -179,7 +197,7 @@ function Menu() {
 				req.models.menu.find({ id: fields.id[0] }, function (err, rows) {
 					if (err || rows.length == 0) {
 						res.send('0');
-						return;
+						return
 					}
 					
 					//修改数据
@@ -193,7 +211,7 @@ function Menu() {
 					row.save(function (err) {
 						if (err) {
 							res.send('0');
-							return;
+							return
 						}
 						
 						res.send('1');
@@ -213,7 +231,7 @@ function Menu() {
 		dbUser.find({ device_id: params.deviceId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			var userId = rows[0].id;
@@ -227,7 +245,7 @@ function Menu() {
 			}, function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -252,7 +270,7 @@ function Menu() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -263,7 +281,7 @@ function Menu() {
 		dbMenu.find({ id: menuId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			var row = rows[0];
@@ -272,7 +290,7 @@ function Menu() {
 			row.save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -288,7 +306,7 @@ function Menu() {
 		dbMenu.find({ id: menuId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			var row = rows[0];
@@ -297,7 +315,7 @@ function Menu() {
 			row.save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');

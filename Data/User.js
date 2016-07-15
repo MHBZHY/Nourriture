@@ -21,17 +21,17 @@ function User() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');    //unknown error
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');   //user not found
-				return;
+				return
 			}
 			
 			if (rows[0].password != params.password) {
 				res.send('-2'); //password error
-				return;
+				return
 			}
 			
 			callBack(rows[0].id);
@@ -49,17 +49,17 @@ function User() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');    //unknown error
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');   //user not found
-				return;
+				return
 			}
 			
 			if (rows[0].password != params.password) {
 				res.send('-2'); //password error
-				return;
+				return
 			}
 			
 			callBack(rows[0].id);
@@ -76,7 +76,7 @@ function User() {
 		}, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			console.log(rows);
@@ -94,34 +94,62 @@ function User() {
 		dbUser.find(function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows);
 		})
 	};
 	
-	//是否存在
-	this.isExist = function (name, dbDriver, res) {
-		var sql = 'select name from user where name={name}'.format({
-			name: name
+	//用户是否存在
+	this.isExist = function (params, dbUser, res, callBack) {
+		if (params.id) {
+			dbUser.exists({ id: params.id }, function (err, count) {
+				if (err || !count) {
+					res.send('0');
+					return
+				}
+				
+				callBack()
+			})
+		}
+	};
+	
+	//名称是否已存在
+	this.nameIsExist = function (name, dbUser, res, callBack) {
+		dbUser.exists({ name: name }, function (err, count) {
+			if (err) {
+				res.send('-1');
+				return
+			}
+			
+			if (!count) {
+				res.send('0');
+				return
+			}
+			
+			callBack()
 		});
 		
-		console.log(sql);
-		
-		dbDriver.execQuery(sql, function (err, rows) {
-			if (err) {
-				res.send('0');
-				return;
-			}
-			
-			if (rows.length == 0) {
-				res.send('-1');
-				return;
-			}
-			
-			res.send('1');
-		})
+		// var sql = 'select name from user where name={name}'.format({
+		// 	name: name
+		// });
+		//
+		// console.log(sql);
+		//
+		// dbDriver.execQuery(sql, function (err, rows) {
+		// 	if (err) {
+		// 		res.send('0');
+		// 		return
+		// 	}
+		//
+		// 	if (rows.length == 0) {
+		// 		res.send('-1');
+		// 		return
+		// 	}
+		//
+		// 	res.send('1');
+		// })
 	};
 	
 	//更新信息
@@ -131,7 +159,7 @@ function User() {
 			req.models.user.find({ device_id: fields.deviceId[0] }, function (err, rows) {
 				if (err || rows.length == 0) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				//userId
@@ -159,7 +187,7 @@ function User() {
 					row.save(function (err) {
 						if (err) {
 							res.send('0');
-							return;
+							return
 						}
 						
 						res.send('1');
@@ -185,7 +213,7 @@ function User() {
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			res.send('1');
@@ -204,12 +232,12 @@ function User() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');
-				return;
+				res.send('-10');    //未登录
+				return
 			}
 			
 			callBack(rows[0].id)
@@ -221,7 +249,7 @@ function User() {
 		dbUser.find({ id: id }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows);
@@ -233,12 +261,12 @@ function User() {
 		dbUser.find({ name: name }, function (err, rows) {
 			if (err) {
 				res.send('0');  //内部错误
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1'); //未找到
-				return;
+				return
 			}
 			
 			callBack(rows);
@@ -250,12 +278,12 @@ function User() {
 		dbUser.find({ device_id: deviceId }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');
-				return;
+				return
 			}
 			
 			callBack(rows);
@@ -271,7 +299,7 @@ function User() {
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			if (callBack) {
@@ -294,7 +322,7 @@ function User() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -310,7 +338,7 @@ function User() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -318,23 +346,23 @@ function User() {
 	};
 	
 	//封禁/删除
-	this.del = function (id, dbUser, res, callBack) {
-		dbUser.find({ id: id }, function (err, rows) {
+	this.del = function (userId, dbUser, res, callBack) {
+		dbUser.find({ id: userId }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');
-				return;
+				return
 			}
 			
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -347,23 +375,23 @@ function User() {
 	};
 	
 	//激活
-	this.activate = function (id, dbUser, res, callBack) {
-		dbUser.find({ id: id }, function (err, rows) {
+	this.activate = function (userId, dbUser, res, callBack) {
+		dbUser.find({ id: userId }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');
-				return;
+				return
 			}
 			
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -384,7 +412,7 @@ function User() {
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			res.send('1');
@@ -403,12 +431,12 @@ function User() {
 		}, function (err, rows) {
 			if (err) {
 				res.send('0');  //内部错误
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1'); //密码错误
-				return;
+				return
 			}
 			
 			//设置session

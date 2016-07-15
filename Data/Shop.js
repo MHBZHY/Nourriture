@@ -9,7 +9,7 @@ function Shop() {
 	var uploadPath = '/upload';
 	
 	
-	//根据account获取密码
+	//根据name验证
 	this.authByName = function (name, password, dbDriver, res, callBack) {
 		var sql = 'SELECT id, password, del FROM shop ' +
 			'WHERE name="{name}"'.format({
@@ -21,25 +21,47 @@ function Shop() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');    //internal error
-				return;
+				return
 			}
 			
 			if (rows[0].del == 1) {
 				res.send('-9');     //被封禁
-				return;
+				return
 			}
 			
 			if (rows.length == 0) {
 				res.send('-1');   //user not found
-				return;
+				return
 			}
 			
 			if (password != rows[0].password) {
 				res.send('-2');     //password error
-				return;
+				return
 			}
 			
 			callBack(rows[0].id);
+		})
+	};
+	
+	//账户是否存在
+	this.isExist = function () {
+		
+	};
+	
+	//名称是否存在
+	this.nameIsExist = function (name, dbShop, res, callBack) {
+		dbShop.exists({ name: name }, function (err, count) {
+			if (err) {
+				res.send('-1');
+				return
+			}
+			
+			if (!count) {
+				res.send('0');
+				return
+			}
+			
+			callBack()
 		})
 	};
 	
@@ -48,7 +70,7 @@ function Shop() {
 		dbShop.find(function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows);
@@ -76,7 +98,7 @@ function Shop() {
 			req.db.driver.execQuery(sql, function (err, result) {
 				if (err || result.length == 0) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				console.log(result);
@@ -104,7 +126,7 @@ function Shop() {
 						req.models.shop.find({ id: shopId }, function (err, rows) {
 							if (err || rows.length == 0) {
 								res.send('0');
-								return;
+								return
 							}
 							
 							rows[0].img = uploadPath + imgPath + imgName;
@@ -112,7 +134,7 @@ function Shop() {
 							rows[0].save(function (err) {
 								if (err) {
 									res.send('0');
-									return;
+									return
 								}
 								
 								res.send('1');
@@ -128,13 +150,12 @@ function Shop() {
 		})
 	};
 	
-	//根据account获取信息
-	//TO DO
+	//根据id获取信息
 	this.getById = function (id, dbShop, res, callBack) {
 		dbShop.find({ id: id }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -146,7 +167,7 @@ function Shop() {
 		dbShop.find({ name: name }, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -165,7 +186,7 @@ function Shop() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows);
@@ -182,7 +203,7 @@ function Shop() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack(rows)
@@ -190,11 +211,11 @@ function Shop() {
 	};
 	
 	//封禁/删除
-	this.del = function (id, dbShop, res, callBack) {
-		dbShop.find({ id: id }, function (err, rows) {
+	this.del = function (shopId, dbShop, res, callBack) {
+		dbShop.find({ id: shopId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			//设置del为1, 表示被封禁
@@ -202,7 +223,7 @@ function Shop() {
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');
@@ -215,11 +236,11 @@ function Shop() {
 	};
 	
 	//激活
-	this.activate = function (id, dbShop, res, callBack) {
-		dbShop.find({ id: id }, function (err, rows) {
+	this.activate = function (shopId, dbShop, res, callBack) {
+		dbShop.find({ id: shopId }, function (err, rows) {
 			if (err || rows.length == 0) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			//设置del为0, 表示已激活
@@ -227,7 +248,7 @@ function Shop() {
 			rows[0].save(function (err) {
 				if (err) {
 					res.send('0');
-					return;
+					return
 				}
 				
 				res.send('1');

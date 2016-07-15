@@ -17,7 +17,7 @@ function File() {
 		form.parse(req, function (err, fields, files) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			console.log(fields + files);
@@ -52,7 +52,7 @@ function File() {
 		fs.rename(oldPath, uploadPath + newPath + fileName, function (err) {
 			if (err) {
 				res.send('0');
-				return;
+				return
 			}
 			
 			callBack();

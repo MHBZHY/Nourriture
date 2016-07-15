@@ -11,7 +11,7 @@ function Order() {
 
 		connection.query(sql, function (err, rows) {
 			if (err) {
-				return;
+				return
 			}
 
 			if (callBack != undefined) {
@@ -25,7 +25,7 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return;
+				return
 			}
 
 			if (callBack != undefined) {
@@ -39,7 +39,7 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return;
+				return
 			}
 
 			if (callBack != undefined) {
@@ -53,7 +53,7 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return;
+				return
 			}
 
 			if (callBack != undefined) {
