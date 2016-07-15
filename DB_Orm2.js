@@ -28,7 +28,11 @@ module.exports.createOrmConnection = function (app) {
 			models.menu_shop_user = db.define('menu_shop_user', {
 				menu_id: Number,
 				user_id: Number,
-				shop_id: Number,
+				shop_id: Number
+			});
+			models.menu_evaluate = db.define('menu_evaluate', {
+				menu_id: Number,
+				user_id: Number,
 				evaluate: String,
 				score: Number
 			});

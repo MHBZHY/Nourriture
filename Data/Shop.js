@@ -11,7 +11,7 @@ function Shop() {
 	
 	//根据account获取密码
 	this.authByName = function (name, password, dbDriver, res, callBack) {
-		var sql = 'SELECT id, password FROM shop ' +
+		var sql = 'SELECT id, password, del FROM shop ' +
 			'WHERE name="{name}"'.format({
 				name: name
 			});
@@ -21,6 +21,11 @@ function Shop() {
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');    //internal error
+				return;
+			}
+			
+			if (rows[0].del == 1) {
+				res.send('-9');     //被封禁
 				return;
 			}
 			

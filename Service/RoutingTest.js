@@ -137,6 +137,24 @@ module.exports.router = function (app) {
 		menu.updateById(req, res);
 	});
 	
+	app.post('/menu_evaluate', urlEncodedParser, function (req, res) {
+		menu.evaluate(req.body, req.models.menu_evaluate, req.models.user, res);
+	});
+	
+	app.post('/menu_get_evaluate', urlEncodedParser, function (req, res) {
+		menu.getEvaluate(req.body.id, req.db.driver, res, function (rows) {
+			res.send(rows)
+		})
+	});
+	
+	app.post('/menu_del', urlEncodedParser, function (req, res) {
+		menu.del(req.body.id, req.models.menu, res);
+	});
+	
+	app.post('/menu_act', urlEncodedParser, function (req, res) {
+		menu.activate(req.body.id, req.models.menu, res);
+	});
+	
 	app.get('/', urlEncodedParser, function (req, res) {
 		res.render('index_test');
 	})

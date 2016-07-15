@@ -104,7 +104,11 @@ function Menu() {
 	};
 	
 	this.all = function (dbMenu, res, callBack) {
-		dbMenu.find(function (err, rows) {
+		//可返回菜单的属主
+		// var sql = 'SELECT name,img,price,description,type,del,score,msu.* FROM menu, menu_shop_user msu ' +
+		// 	'GROUP BY msu.menu_id';
+		
+		dbMenu.find({ del: 0 }, function (err, rows) {
 			if (err) {
 				res.send('0');
 				return;
@@ -116,7 +120,7 @@ function Menu() {
 	
 	//获取单个菜单
 	this.getById = function (menuId, dbMenu, res, callBack) {
-		dbMenu.find({id: menuId}, function (err, rows) {
+		dbMenu.find({id: menuId, del: 0 }, function (err, rows) {
 			if (err) {
 				res.send('0');
 				return;
@@ -129,7 +133,7 @@ function Menu() {
 	this.getByUser = function (deviceId, dbDriver, res, callBack) {
 		user.getIdByDeviceId(deviceId, dbDriver, res, function (userId) {
 			var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
-				'WHERE menu.id=msu.menu_id AND msu.user_id={id}'.format({
+				'WHERE menu.id=msu.menu_id AND msu.user_id={id} AND menu.del=0'.format({
 					id: userId
 				});
 			
@@ -153,7 +157,7 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			callBack(rows)
 		})
 	};
 	
@@ -204,73 +208,106 @@ function Menu() {
 	};
 	
 	//评价菜单
-	this.evaluate = function (menuId, res, callBack) {
-		var sql = '';
-		
-		connection.query(sql, function (err) {
-			if (err) {
+	this.evaluate = function (params, dbMenu_Eval, dbUser, res, callBack) {
+		//寻找用户
+		dbUser.find({ device_id: params.deviceId }, function (err, rows) {
+			if (err || rows.length == 0) {
 				res.send('0');
 				return;
 			}
 			
-			if (callBack) {
-				callBack();
-			}
+			var userId = rows[0].id;
+			
+			//新建评论
+			dbMenu_Eval.create({
+				menu_id: params.id,
+				user_id: userId,
+				evaluate: params.evaluate,
+				score: params.score
+			}, function (err) {
+				if (err) {
+					res.send('0');
+					return;
+				}
+				
+				res.send('1');
+				
+				if (callBack) {
+					callBack()
+				}
+			})
 		})
 	};
 	
-	this.del = function (account, menuType, res, callBack) {
-		var sql;
-		
-		if (menuType == '0') {
-			sql = 'UPDATE `menu-user` SET del = 1 WHERE id=' + account;
-		}
-		else if (menuType == '1') {
-			sql = 'UPDATE `menu-shop` SET del = 1 WHERE id=' + account;
-		}
-		else {
-			res.send('0');
-		}
+	//获得评价
+	this.getEvaluate = function (menuId, dbDriver, res, callBack) {
+		var sql = 'SELECT user.id,user.img,user.name,user.sex,evaluate,score FROM menu_evaluate me, user ' +
+			'WHERE me.user_id=user.id AND me.menu_id={menuId} AND user.del=0'.format({
+				menuId: menuId
+			}) +
+			'GROUP BY user.id;';
 		
 		console.log(sql);
 		
-		connection.query(sql, function (err) {
+		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
 				return;
 			}
 			
-			if (callBack) {
-				callBack();
-			}
+			callBack(rows)
 		})
 	};
 	
-	this.activate = function (account, menuType, res, callBack) {
-		var sql;
-		
-		if (menuType == '0') {
-			sql = 'UPDATE `menu-user` SET del = 0 WHERE id=' + account;
-		}
-		else if (menuType == '1') {
-			sql = 'UPDATE `menu-shop` SET del = 0 WHERE id=' + account;
-		}
-		else {
-			res.send('0');
-			return;
-		}
-		
-		connection.query(sql, function (err) {
-			if (err) {
+	this.del = function (menuId, dbMenu, res, callBack) {
+		dbMenu.find({ id: menuId }, function (err, rows) {
+			if (err || rows.length == 0) {
 				res.send('0');
 				return;
 			}
 			
-			if (callBack) {
-				callBack();
-			}
+			var row = rows[0];
+			
+			row.del = 1;
+			row.save(function (err) {
+				if (err) {
+					res.send('0');
+					return;
+				}
+				
+				res.send('1');
+				
+				if (callBack) {
+					callBack()
+				}
+			})
 		})
 	};
+	
+	this.activate = function (menuId, dbMenu, res, callBack) {
+		dbMenu.find({ id: menuId }, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send('0');
+				return;
+			}
+			
+			var row = rows[0];
+			
+			row.del = 0;
+			row.save(function (err) {
+				if (err) {
+					res.send('0');
+					return;
+				}
+				
+				res.send('1');
+				
+				if (callBack) {
+					callBack()
+				}
+			})
+		})
+	}
 }
 
 module.exports = new Menu();
