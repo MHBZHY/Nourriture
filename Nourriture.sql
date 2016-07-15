@@ -11,7 +11,7 @@
  Target Server Version : 50711
  File Encoding         : utf-8
 
- Date: 07/13/2016 09:18:53 AM
+ Date: 07/14/2016 15:52:41 PM
 */
 
 SET NAMES utf8;
@@ -48,23 +48,10 @@ CREATE TABLE `friend` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
---  Table structure for `material-shop`
+--  Table structure for `material`
 -- ----------------------------
-DROP TABLE IF EXISTS `material-shop`;
-CREATE TABLE `material-shop` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(40) COLLATE utf8_bin NOT NULL,
-  `img` varchar(200) COLLATE utf8_bin NOT NULL,
-  `nutrition_value` varchar(2000) COLLATE utf8_bin NOT NULL,
-  `del` smallint(6) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- ----------------------------
---  Table structure for `material-user`
--- ----------------------------
-DROP TABLE IF EXISTS `material-user`;
-CREATE TABLE `material-user` (
+DROP TABLE IF EXISTS `material`;
+CREATE TABLE `material` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `nutrition_value` varchar(1000) COLLATE utf8_bin NOT NULL,
@@ -74,10 +61,10 @@ CREATE TABLE `material-user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
---  Records of `material-user`
+--  Records of `material`
 -- ----------------------------
 BEGIN;
-INSERT INTO `material-user` VALUES ('1', '23224', '4234234', '0', '2342342');
+INSERT INTO `material` VALUES ('1', '23224', '4234234', '0', '2342342');
 COMMIT;
 
 -- ----------------------------
@@ -93,6 +80,7 @@ CREATE TABLE `menu-shop` (
   `type` varchar(10) COLLATE utf8_bin DEFAULT NULL,
   `del` smallint(6) NOT NULL DEFAULT '0',
   `evaluate` varchar(1000) COLLATE utf8_bin DEFAULT NULL,
+  `score` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `menu-shop_shop_id_fk` FOREIGN KEY (`id`) REFERENCES `shop` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -101,7 +89,7 @@ CREATE TABLE `menu-shop` (
 --  Records of `menu-shop`
 -- ----------------------------
 BEGIN;
-INSERT INTO `menu-shop` VALUES ('1', '2131', '24113', '1234', 'wfwrverrveverv', '1', '0', 'efw32f4');
+INSERT INTO `menu-shop` VALUES ('1', '2131', '24113', '1234', 'wfwrverrveverv', '1', '0', 'efw32f4', null);
 COMMIT;
 
 -- ----------------------------
@@ -109,7 +97,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `menu-user`;
 CREATE TABLE `menu-user` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `img` varchar(100) COLLATE utf8_bin NOT NULL,
   `price` double DEFAULT NULL,
@@ -117,45 +105,35 @@ CREATE TABLE `menu-user` (
   `type` varchar(10) COLLATE utf8_bin NOT NULL,
   `del` smallint(6) NOT NULL DEFAULT '0',
   `evaluate` varchar(1000) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `menu-user_user_id_fk` FOREIGN KEY (`id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `score` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 --  Records of `menu-user`
 -- ----------------------------
 BEGIN;
-INSERT INTO `menu-user` VALUES ('2', '214', 'ergrgr3qb', null, 'ewrgw3243', 'wqfw2', '0', 'qwe234g2\n\n');
+INSERT INTO `menu-user` VALUES ('2', '214', 'ergrgr3qb', null, 'ewrgw3243', 'wqfw2', '0', 'qwe234g2', null), ('3', '2145', 'ergrgr3qb', null, 'ewrgw3243', 'wqfw2', '0', 'qwe234g2', null);
 COMMIT;
 
 -- ----------------------------
---  Table structure for `menu_material-shop`
+--  Table structure for `menu_material`
 -- ----------------------------
-DROP TABLE IF EXISTS `menu_material-shop`;
-CREATE TABLE `menu_material-shop` (
+DROP TABLE IF EXISTS `menu_material`;
+CREATE TABLE `menu_material` (
   `menu_id` int(11) NOT NULL,
   `material_id` int(11) NOT NULL,
   PRIMARY KEY (`menu_id`,`material_id`),
-  KEY `menu_material-shop_material_shop_id_fk` (`material_id`),
-  CONSTRAINT `menu_material-shop_material_shop_id_fk` FOREIGN KEY (`material_id`) REFERENCES `material-shop` (`id`),
-  CONSTRAINT `menu_material-shop_menu-shop_id_fk` FOREIGN KEY (`menu_id`) REFERENCES `menu-shop` (`id`)
+  KEY `menu_material-user_material-user_id_fk` (`material_id`),
+  CONSTRAINT `menu_material-user_material-user_id_fk` FOREIGN KEY (`material_id`) REFERENCES `material` (`id`),
+  CONSTRAINT `menu_material-user_menu-user_id_fk` FOREIGN KEY (`menu_id`) REFERENCES `menu-user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
---  Table structure for `menu_material-user`
--- ----------------------------
-DROP TABLE IF EXISTS `menu_material-user`;
-CREATE TABLE `menu_material-user` (
-  `menu_id` int(11) NOT NULL,
-  `material_id` int(11) NOT NULL,
-  PRIMARY KEY (`menu_id`,`material_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- ----------------------------
---  Records of `menu_material-user`
+--  Records of `menu_material`
 -- ----------------------------
 BEGIN;
-INSERT INTO `menu_material-user` VALUES ('1', '1');
+INSERT INTO `menu_material` VALUES ('2', '1'), ('3', '1');
 COMMIT;
 
 -- ----------------------------
@@ -198,13 +176,13 @@ CREATE TABLE `shop` (
   `del` smallint(6) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `shop_account_uindex` (`account`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 --  Records of `shop`
 -- ----------------------------
 BEGIN;
-INSERT INTO `shop` VALUES ('1', '123456', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31322', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('2', '123457', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31321', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('3', '123458', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31323', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('4', '123459', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31324', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0');
+INSERT INTO `shop` VALUES ('1', '123456', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31322', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('2', '123457', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31321', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('3', '123458', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31323', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('4', '123459', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '31324', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0'), ('5', '123450', '13123', '/Public/upload/123456/certificate.jpg', '1232131', '32689', '2016-07-10 09:17:49', '123213', '/Public/upload/123456/background.jpg', '1312', '1231213', '132123', '34.6', '0');
 COMMIT;
 
 -- ----------------------------
@@ -221,19 +199,19 @@ CREATE TABLE `user` (
   `birthday` date DEFAULT NULL,
   `sex` varchar(2) COLLATE utf8_bin DEFAULT NULL,
   `del` smallint(6) NOT NULL DEFAULT '0',
-  `deviceid` varchar(100) COLLATE utf8_bin DEFAULT NULL,
+  `deviceId` varchar(100) COLLATE utf8_bin DEFAULT NULL,
   `reg_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `longitude` double DEFAULT NULL,
   `latitude` double DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_account_uindex` (`account`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 --  Records of `user`
 -- ----------------------------
 BEGIN;
-INSERT INTO `user` VALUES ('1', '12312', '234233', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null), ('2', '12311', '234234', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null), ('3', '12313', '234235', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null);
+INSERT INTO `user` VALUES ('1', '12312', '234233', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null), ('2', '12311', '234234', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null), ('3', '12313', '234235', '2423412', '23424', '234234', null, '1', '0', null, '2016-07-12 09:47:32', null, null), ('4', 'mhbzhy', '111111', '2934729387', '/Public/upload/111111/face.jpg', '18501905817', '1996-06-28', '1', '0', '11', '2016-07-13 10:36:21', null, null);
 COMMIT;
 
 -- ----------------------------

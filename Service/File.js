@@ -16,9 +16,11 @@ function File() {
 		//解析二进制表单
 		form.parse(req, function (err, fields, files) {
 			if (err) {
-				res.send('数据流解析错误');
+				res.send('0');
 				return;
 			}
+			
+			console.log(fields + files);
 
 			//解析出的非二进制字段及文件
 			callBack(fields, files);
@@ -29,7 +31,22 @@ function File() {
 		//判断用户目录
 		if (!fs.existsSync(uploadPath + newPath)) {
 			//无则创建
-			fs.mkdirSync(uploadPath + newPath);
+			var pathTmp;
+			
+			newPath.split('/').forEach(function(dirName) {
+				if (pathTmp) {
+					pathTmp = path.join(pathTmp, '/' + dirName);
+				}
+				else {
+					pathTmp = '/' + dirName;
+				}
+				
+				var dirPath = uploadPath + pathTmp;
+				
+				if (!fs.existsSync(dirPath)) {
+					fs.mkdirSync(dirPath);
+				}
+			})
 		}
 
 		fs.rename(oldPath, uploadPath + newPath + fileName, function (err) {

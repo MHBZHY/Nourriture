@@ -11,7 +11,7 @@ var cookie = require('cookie-parser');
 //设置跨域访问
 app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
     // res.header("X-Powered-By",' 3.2.1');
     // res.header("Content-Type", "application/json;charset=utf-8");
@@ -36,10 +36,8 @@ app.use(function (req, res, next) {
     next();
 });
 
-//注册post处理
-var routing = require('./Service/Routing');
-
-routing.parse(app);
+//orm操作数据库(实验中)
+require('./DB_Orm2').createOrmConnection(app);
 
 //静态页面
 app.use(express.static(__dirname + '/Public'));
@@ -51,6 +49,10 @@ app.set('views', __dirname + '/Public/view');
 
 //设置一些扩展函数
 require('./Service/Tools').stringFormat();
+
+//注册post处理
+// require('./Service/Routing').parse(app);
+require('./Service/RoutingTest').router(app);
 
 //启动服务器
 app.listen(8088, function () {

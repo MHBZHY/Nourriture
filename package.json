@@ -8,6 +8,9 @@
     "ejs": "latest",
     "mysql": "latest",
     "body-parser": "latest",
-    "multiparty": "latest"
+    "multiparty": "latest",
+    "orm": "latest",
+    "express-router": "latest",
+    "router": "latest"
   }
 }

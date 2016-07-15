@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h3>注册用户</h3>
+<form action="../../register_user" method="post">
+    <input type="text" name="name" placeholder="name">
+    <input type="password" name="password" placeholder="password">
+    <input type="text" name="phone" placeholder="phone">
+    <input type="submit" value="submit">
+</form>
+<h3>获取所有用户</h3>
+<form action="../../all_user" method="post">
+    <input type="submit" value="submit">
+</form>
+<h3>用户是否存在</h3>
+<form action="../../user_exist" method="post">
+    <input type="text" name="name" placeholder="name">
+    <input type="submit" value="submit">
+</form>
+<h3>用户登录</h3>
+<form action="../../user_login" method="post">
+    <input type="text" name="name" placeholder="name">
+    <input type="password" name="password" placeholder="password">
+    <input type="text" name="deviceId" placeholder="deviceId">
+    <input type="submit" value="submit">
+</form>
+<h3>用户信息更新</h3>
+<form action="../../user_update" method="post" enctype="multipart/form-data">
+    <input type="text" name="deviceId" placeholder="device_id">
+    <input type="text" name="name" placeholder="name">
+    <!--<input type="file" name="img" placeholder="img">-->
+    <input type="text" name="sex" placeholder="sex">
+    <input type="text" name="birthday" placeholder="birthday">
+    <input type="text" name="phone" placeholder="phone">
+    <input type="text" name="longitude" placeholder="longitude">
+    <input type="text" name="latitude" placeholder="latitude">
+    <input type="file" name="img" placeholder="img">
+    <input type="submit" value="submit">
+</form>
+<h3>获取用户信息</h3>
+<form action="../../user_id" method="post">
+    <input type="text" name="id" placeholder="id">
+    <input type="submit" value="submit">
+</form>
+<h3>获取用户信息</h3>
+<form action="../../user_name" method="post">
+    <input type="text" name="name" placeholder="name">
+    <input type="submit" value="submit">
+</form>
+<h3>获取用户信息</h3>
+<form action="../../user_deviceId" method="post">
+    <input type="text" name="deviceId" placeholder="deviceId">
+    <input type="submit" value="submit">
+</form>
+<h3>封禁用户</h3>
+<form action="../../user_del" method="post">
+    <input type="text" name="id" placeholder="id">
+    <input type="submit" value="submit">
+</form>
+<h3>注销</h3>
+<form action="../../user_logout" method="post">
+    <input type="text" name="deviceId" placeholder="deviceId">
+    <input type="submit" value="submit">
+</form>
+<h3>管理员登陆</h3>
+<form action="../../admin_login" method="post">
+    <input type="text" name="id" placeholder="id">
+    <input type="password" name="password" placeholder="password">
+    <input type="submit" value="submit">
+</form>
+<h3>所有餐厅</h3>
+<form action="../../shop_all" method="post">
+    <input type="submit" value="submit">
+</form>
+<h3>注册餐厅</h3>
+<form action="../../register_shop" method="post" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="name">
+    <input type="password" name="password" placeholder="password">
+    <input type="text" name="address" placeholder="address">
+    <input type="text" name="phone" placeholder="phone">
+    <input type="text" name="description" placeholder="description">
+    <input type="text" name="ads" placeholder="ads">
+    <input type="text" name="longitude" placeholder="longitude">
+    <input type="text" name="latitude" placeholder="latitude">
+    <input type="file" name="img">
+    <input type="file" name="certificate">
+    <input type="submit" value="submit">
+</form>
+
+</body>
+</html>

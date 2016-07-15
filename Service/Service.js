@@ -5,24 +5,26 @@ function Service() {
 	// var self = this;
 
 	var user = require('../Data/User');
-	var restaurant = require('../Data/Restaurant');
+	var restaurant = require('../Data/Shop');
 	var menu = require('../Data/Menu');
 	var order = require('../Data/Order');
+	var material = require('../Data/Material');
+	
 
 	//登陆
 	this.login = function (req, res) {
 		//app
-		if (req.body.device_id) {
+		if (req.body.deviceId) {
 			//用户登录
 			//搜索用户名称
-			user.getPasswordByAccount(req.body.id, res,  function (rows) {
+			user.authByName(req.body.id, res,  function (rows) {
 				if (rows[0].password != req.body.password) {
 					res.send('-2');   //-2: password error
 					return;
 				}
 				
 				//将设备与用户绑定
-				user.bindWithDevice(req.body.device_id, rows[0].id, res, function () {
+				user.bindWithDevice(req.body.deviceId, rows[0].id, res, function () {
 					res.send('1');
 				});
 			})
@@ -38,56 +40,25 @@ function Service() {
 			else {
 				//餐厅登陆
 				//搜索商户
-				restaurant.getPasswordByAccount(req.body.id, res, function (rows) {
+				restaurant.authByName(req.body.id, res, function (rows) {
 					if (rows[0].password != req.body.password) {
 						res.send('-2');   //password incorrect
 						return;
 					}
 					
 					//注册session
-					req.session.userId = rows[0].id;
+					req.session.userId = req.body.id;
 					//返回成功
 					res.send('1');
+					// res.redirect('/view/show.html');
 				})
 			}
 		}
 	};
-	
 
 	//注册
 	this.register = function (req, res) {
-		// if (req.headers['content-type'].split(';')[0] == 'multipart/form-data') {
-		// 	file.parse(req, res, function (err, fields, files) {
-		// 		if (fields.device_id[0]) {
-		// 			//用户注册
-		// 			user.add(fields, files, res, function () {
-		// 				res.send('1');    //register success
-		// 			})
-		// 		}
-		// 		else {
-		// 			//餐厅注册
-		// 			restaurant.add(req, res, function () {
-		// 				res.send('1');    //register success
-		// 			})
-		// 		}
-		// 	})
-		// }
-		// else {
-		// 	if (req.body.device_id) {
-		// 		//用户注册
-		// 		user.add(fields, files, res, function () {
-		// 			res.send('1');    //register success
-		// 		})
-		// 	}
-		// 	else {
-		// 		//餐厅注册
-		// 		restaurant.add(req, res, function () {
-		// 			res.send('1');    //register success
-		// 		})
-		// 	}
-		// }
-		
-		if (req.body.device_id) {
+		if (req.body.deviceId) {
 			//来自app
 			user.add(req, res, function () {
 				res.send('1');
@@ -97,6 +68,7 @@ function Service() {
 			//来自web
 			restaurant.add(req, res, function () {
 				res.send('1');
+				// res.redirect('');
 			})
 		}
 	};
@@ -104,8 +76,8 @@ function Service() {
 	//注销
 	this.logout = function (req, res) {
 		//deviceId存在
-		if (req.body.device_id != undefined) {
-			user.logout(req.body.device_id, res, function () {
+		if (req.body.deviceId != undefined) {
+			user.logout(req.body.deviceId, res, function () {
 				res.send('1');
 			})
 		}
@@ -125,30 +97,32 @@ function Service() {
 	//获取用户信息
 	this.userInfo = function (req, res) {
 		//管理员未登陆
+		//session replace
+		//仅管理员
 		if (req.session.admin) {
-			if (req.body.id) {
-				user.getInfoByAccount(req.body.id, res, function (rows) {
-					res.send(rows[0]);
-				})
-			}
-			else if (req.body.name) {
-				user.getInfoByName(req.body.name, res, function (rows) {
-					res.send(rows[0]);
-				})
-			}
-			else {
-				user.all(res, function (rows) {
+			if (!req.body.id && !req.body.name) {
+				user.all(req, res, function (rows) {
 					res.send(rows);
 				})
 			}
 		}
-		else {
+		
+		//通用
+		if (req.body.id) {
+			user.getById(req.body.id, res, function (rows) {
+				res.send(rows[0]);
+			})
+		}
+		else if (req.body.name) {
+			user.getByName(req.body.name, res, function (rows) {
+				res.send(rows[0]);
+			})
+		}
+		else if (req.body.deviceId) {
 			//搜索id
-			user.searchByDeviceId(req.body.device_id, res, function (rows) {
+			user.getByDeviceId(req.body.deviceId, res, function (rows) {
 				//根据id返回信息
-				user.getPasswordByAccount(rows[0].id, res, function (rows) {
-					res.send(rows);
-				})
+				res.send(rows);
 			});
 		}
 	};
@@ -157,13 +131,13 @@ function Service() {
 	this.restaurantInfo = function (req, res) {
 		if (req.body.id) {
 			//根据account获取
-			restaurant.getInfoByAccount(req.body.id, res, function (rows) {
+			restaurant.getById(req.body.id, res, function (rows) {
 				res.send(rows[0]);
 			})
 		}
 		else if (req.body.name) {
 			//根据name获取
-			restaurant.getInfoByName(req.body.name, res, function (rows) {
+			restaurant.getByName(req.body.name, res, function (rows) {
 				res.send(rows[0]);
 			})
 		}
@@ -178,7 +152,8 @@ function Service() {
 				return;
 			}
 			
-			restaurant.getInfoByAccount(req.session.userId, res, function (rows) {
+			//session replace
+			restaurant.getById(req.body.id, res, function (rows) {
 				res.send(rows);
 			})
 		}
@@ -207,9 +182,16 @@ function Service() {
 		// 	}
 		// }
 		// else {
-			menu.getInBound(req.body.page, req.body.amount, res, function (rows) {
-				res.send(rows);
-			});
+			if (req.body.page && req.body.amount) {
+				menu.getInBound(req.body.page, req.body.amount, res, function (rows) {
+					res.send(rows);
+				});
+			}
+			else {
+				menu.all(req, res, function (rows) {
+					res.send(rows);
+				})
+			}
 		// }
 	};
 
@@ -264,14 +246,7 @@ function Service() {
 	
 	//获取附近好友
 	this.friendInBound = function (req, res) {
-		user.friendInBound(req.body.device_id, req.body.lon, req.body.lat, res, function (rows) {
-			res.send(rows);
-		})
-	};
-	
-	//获取附近用户
-	this.userInBound = function (req, res) {
-		user.inBound(req.body.lon, req.body.lat, res, function (rows) {
+		user.friendInBound(req.body.deviceId, req.body.lon, req.body.lat, res, function (rows) {
 			res.send(rows);
 		})
 	};
@@ -354,6 +329,19 @@ function Service() {
 			
 			default:
 				break;
+		}
+	};
+	
+	this.material = function (req, res) {
+		if (req.body.type == '0') {
+			material.getByMenuIdForUser(req.body.id, res, function (rows) {
+				res.send(rows);
+			})
+		}
+		else if (req.body.type == 1) {
+			material.getByMenuIdForShop(req.body.id, res, function (rows) {
+				res.send(rows);
+			})
 		}
 	}
 }

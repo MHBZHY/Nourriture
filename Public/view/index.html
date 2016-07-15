@@ -15,22 +15,33 @@
 
 <h3>登陆</h3>
 <form action="../../login" method="post">
-    <input type="text" name="account">
+    <input type="text" name="id">
     <input type="password" name="password">
     <input type="submit" value="登陆">
 </form>
 
-<h3>搜索建议</h3>
+<h3>搜索建议shop name</h3>
 <form action="../../restaurant_search" method="post">
     <input type="text" name="name" placeholder="搜索">
     <input type="submit" value="查找">
 </form>
 
-<h3>获取商家信息</h3>
+<h3>搜索建议用户name</h3>
+<form action="../../">
+
+</form>
+
+<h3>获取商家信息name</h3>
 <form action="../../restaurant" method="post">
     <!--<input type="text" name="id">-->
     <input type="text" name="name">
     <input type="submit" value="提交">
+</form>
+
+<h3>获取商家信息id</h3>
+<form action="../../restaurant" method="post">
+    <input type="text" name="id" placeholder="id">
+    <input type="submit" value="submit">
 </form>
 
 <h3>封禁</h3>
@@ -40,10 +51,17 @@
     <input type="submit" value="提交">
 </form>
 
-<h3>查找用户</h3>
+<h3>查找用户name</h3>
 <form action="../../user" method="post">
     <!--<input type="text" name="id">-->
     <input type="text" name="name">
+    <input type="submit" value="提交">
+</form>
+
+<h3>查找用户deviceId</h3>
+<form action="../../user" method="post">
+    <!--<input type="text" name="id">-->
+    <input type="text" name="deviceId">
     <input type="submit" value="提交">
 </form>
 
@@ -52,18 +70,41 @@
     <input type="text" name="name" placeholder="name">
     <input type="text" name="password" placeholder="password">
     <!--<input type="file" name="img" placeholder="img">-->
-    <input type="text" name="device_id" placeholder="device_id">
+    <input type="text" name="deviceId" placeholder="deviceId">
     <input type="submit" value="submit">
 </form>
 
 <h3>更新用户信息</h3>
 <form action="../../user_update" method="post" enctype="multipart/form-data">
-    <!--<input type="text" name="account" placeholder="account">-->
+    <!--<input type="text" name="id" placeholder="id">-->
     <input type="text" name="name" placeholder="name">
     <input type="text" name="phone" placeholder="phone">
     <input type="file" name="img" placeholder="img">
     <input type="text" name="birthday" placeholder="birthday">
     <input type="text" name="sex" placeholder="sex">
-    <input type="text" name="device_id" placeholder="device_id">
+    <input type="text" name="deviceId" placeholder="deviceId">
     <input type="submit" value="submit">
 </form>
+
+<h3>上传菜单</h3>
+<form action="../../menu_add" method="post">
+    <input type="text" name="name" placeholder="name">
+    <input type="text" name="img" placeholder="img">
+    <input type="text" name="price" placeholder="price">
+    <input type="text" name="description" placeholder="description">
+    <input type="text" name="type" placeholder="type">
+    <input type="text" name="evaluate" placeholder="evaluate">
+    <input type="text" name="score" placeholder="score">
+    <input type="submit" value="submit">
+</form>
+
+<h3>获取所有菜单</h3>
+<form action="../../menu" method="post">
+    <input type="submit" value="submit">
+</form>
+
+<form action="">
+    <input type="text" name="id" value="1">
+    <input type="submit">
+</form>
+
