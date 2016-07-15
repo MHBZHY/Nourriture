@@ -8,6 +8,36 @@ function Shop() {
 	var file = require('../Service/File');
 	var uploadPath = '/upload';
 	
+	
+	//根据account获取密码
+	this.authByName = function (name, password, dbDriver, res, callBack) {
+		var sql = 'SELECT id, password FROM shop ' +
+			'WHERE name="{name}"'.format({
+				name: name
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');    //internal error
+				return;
+			}
+			
+			if (rows.length == 0) {
+				res.send('-1');   //user not found
+				return;
+			}
+			
+			if (password != rows[0].password) {
+				res.send('-2');     //password error
+				return;
+			}
+			
+			callBack(rows[0].id);
+		})
+	};
+	
 	//返回所有shop信息
 	this.all = function (dbShop, res, callBack) {
 		dbShop.find(function (err, rows) {
@@ -93,39 +123,7 @@ function Shop() {
 	//根据account获取信息
 	//TO DO
 	this.getById = function (id, dbShop, res, callBack) {
-		dbShop.find({id: id}, function (err, rows) {
-			if (err) {
-				res.send('0');
-				return;
-			}
-			
-			if (callBack != undefined) {
-				callBack(rows)
-			}
-		});
-		
-		// var sql = 'SELECT id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
-		// 	'WHERE account = "{account}"'.format({
-		// 		account: account
-		// 	});
-		//
-		// console.log(sql);
-		//
-		// connection.query(sql, function (err, rows) {
-		// 	if (err) {
-		// 		res.send('0');
-		// 		return;
-		// 	}
-		//
-		// 	if (callBack != undefined) {
-		// 		callBack(rows)
-		// 	}
-		// })
-	};
-	
-	//根据名称获取信息
-	this.getByName = function (name, dbShop, res, callBack) {
-		dbShop.find({name: name}, function (err, rows) {
+		dbShop.find({ id: id }, function (err, rows) {
 			if (err) {
 				res.send('0');
 				return;
@@ -133,50 +131,18 @@ function Shop() {
 			
 			callBack(rows)
 		});
-		
-		// var sql = 'SELECT account id, name, certificate, address, phone, reg_date, img, description, ads, longitude, latitude FROM shop ' +
-		// 	'WHERE name = "{name}"'.format({
-		// 		name: name
-		// 	});
-		//
-		// console.log(sql);
-		//
-		// connection.query(sql, function (err, rows) {
-		// 	if (err) {
-		// 		res.send('0');
-		// 		return;
-		// 	}
-		//
-		// 	if (callBack) {
-		// 		callBack(rows)
-		// 	}
-		// })
 	};
 	
-	//根据account获取密码
-	this.authByName = function (name, dbDriver, res, callBack) {
-		var sql = 'SELECT password FROM shop ' +
-			'WHERE name="{name}"'.format({
-				name: name
-			});
-		
-		console.log(sql);
-		
-		dbDriver.execQuery(sql, function (err, rows) {
+	//根据名称获取信息
+	this.getByName = function (name, dbShop, res, callBack) {
+		dbShop.find({ name: name }, function (err, rows) {
 			if (err) {
-				res.send('0');    //internal error
+				res.send('0');
 				return;
 			}
 			
-			if (rows.length == 0) {
-				res.send('-1');   //user not found
-				return;
-			}
-			
-			if (callBack != undefined) {
-				callBack(rows)
-			}
-		})
+			callBack(rows)
+		});
 	};
 	
 	//范围内获取餐厅

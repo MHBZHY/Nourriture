@@ -78,6 +78,25 @@ module.exports.router = function (app) {
 		shop.add(req, res);
 	});
 	
+	app.post('/shop_login', urlEncodedParser, function (req, res) {
+		shop.authByName(req.body.name, req.body.password, req.db.driver, res, function (id) {
+			req.session.shopId = id;
+			res.send('1');
+		})
+	});
+	
+	app.post('/shop_id', urlEncodedParser, function (req, res) {
+		shop.getById(req.body.id, req.models.shop, res, function (rows) {
+			res.send(rows);
+		})
+	});
+	
+	app.post('/shop_name', urlEncodedParser, function (req, res) {
+		shop.getByName(req.body.name, req.models.shop, res, function (rows) {
+			res.send(rows);
+		})
+	});
+	
 	app.get('/', urlEncodedParser, function (req, res) {
 		res.render('index_test');
 	})
