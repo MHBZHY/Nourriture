@@ -25,6 +25,10 @@ module.exports.createOrmConnection = function (app) {
 				score: Number,
 				del: Number
 			});
+			models.menu_material = define('menu_material', {
+				menu_id: Number,
+				material_id: Number
+			});
 			models.menu_shop_user = db.define('menu_shop_user', {
 				menu_id: Number,
 				user_id: Number,
@@ -40,7 +44,8 @@ module.exports.createOrmConnection = function (app) {
 				id: Number,
 				name: String,
 				img: String,
-				nutrition_value: String
+				nutrition_value: String,
+				del: Number
 			});
 			models.user = db.define('user', {
 				id: Number,
