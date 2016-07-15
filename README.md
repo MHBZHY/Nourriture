@@ -1,7 +1,7 @@
 # Nourriture
 bjtu tranning
 
-This project is an tranning project orgnized by Beijing Jiaotong University Software Academy in summer vacation for students in grade 2.
+This project is an tranning project organized by Beijing Jiaotong University Software Academy in summer vacation for students in grade 2.
 
 This is also my first regular project using Node.js and Mysql for server-side development.
 
