@@ -5,6 +5,6 @@ This project is an tranning project organized by Beijing Jiaotong University Sof
 
 This is also my first regular project using Node.js and Mysql for server-side development.
 
-Of course this is just a practice project, everyone can take it. Although I think no one will find some valuable things in it.orz.
+Of course this is just a practicing project, everyone can take it. Although I think no one will find some valuable things in it. orz.
 
 If you have some advice to improve the code, contact me and I will be very pleased. ^_^
