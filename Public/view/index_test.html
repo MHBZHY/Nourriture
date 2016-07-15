@@ -122,6 +122,41 @@
     <input type="text" name="id" placeholder="id">
     <input type="submit" value="activate">
 </form>
+<h3>上传菜单</h3>
+<form action="../../menu_add" method="post" enctype="multipart/form-data">
+    <input type="text" name="deviceId" placeholder="deviceId(可选)">
+    <input type="text" name="name" placeholder="name">
+    <input type="file" name="img" placeholder="img">
+    <input type="text" name="price" placeholder="price">
+    <input type="text" name="description" placeholder="description">
+    <input type="text" name="type" placeholder="type">
+    <input type="submit" name="submit">
+</form>
+<h3>获取所有菜单</h3>
+<form action="../../menu_all" method="post">
+    <!--<input type="text" name="type" placeholder="type: 1 shop 0 user">-->
+    <input type="submit" value="submit">
+</form>
+<h3>获取菜单id</h3>
+<form action="../../menu_id" method="post">
+    <input type="text" name="id" placeholder="id">
+    <input type="submit" value="submit">
+</form>
+<h3>获取自己的菜单</h3>
+<form action="../../menu_self" method="post">
+    <input type="text" name="deviceId" placeholder="deviceId" value="123">
+    <input type="submit" value="submit">
+</form>
+<h3>修改菜单id</h3>
+<form action="../../menu_update" method="post" enctype="multipart/form-data">
+    <input type="text" name="id" placeholder="id">
+    <input type="text" name="name" placeholder="name">
+    <input type="file" name="img" placeholder="img">
+    <input type="text" name="price" placeholder="price">
+    <input type="text" name="description" placeholder="description">
+    <input type="text" name="type" placeholder="type">
+    <input type="submit" name="submit">
+</form>
 
 </body>
 </html>

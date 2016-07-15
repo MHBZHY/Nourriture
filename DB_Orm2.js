@@ -15,16 +15,24 @@ module.exports.createOrmConnection = function (app) {
 			// 	finish_date: Date,
 			// 	menus: String
 			// });
-			models.menu = db.define('menu-shop', {
+			models.menu = db.define('menu', {
 				id: Number,
 				name: String,
 				img: String,
 				price: Number,
 				description: String,
 				type: String,
+				score: Number,
 				del: Number
 			});
-			models.material = db.define('material_shop', {
+			models.menu_shop_user = db.define('menu_shop_user', {
+				menu_id: Number,
+				user_id: Number,
+				shop_id: Number,
+				evaluate: String,
+				score: Number
+			});
+			models.material = db.define('material', {
 				id: Number,
 				name: String,
 				img: String,
@@ -37,6 +45,7 @@ module.exports.createOrmConnection = function (app) {
 				sex: String,
 				birthday: String,
 				phone: String,
+				mail: String,
 				longitude: Number,
 				latitude: Number,
 				reg_date: String,

@@ -4,8 +4,9 @@
 function User() {
 	// var self = this;
 	
-	var connection = require('../DB_Class').getConnection();
+	// var connection = require('../DB_Class').getConnection();
 	var file = require('../Service/File');
+	var uploadPath = '/upload';
 	
 	
 	//验证密码, 返回id
@@ -126,40 +127,36 @@ function User() {
 	//更新信息
 	this.update = function (req, res, callBack) {
 		file.parse(req, res, function (fields, files) {
-			var sql = 'SELECT id FROM user WHERE device_id="{deviceId}"'.format({
-				deviceId: fields.deviceId[0]
-			});
-			
-			console.log(sql);
-			
-			//得到路径
-			req.db.driver.execQuery(sql, function (err, rows) {
+			//得到用户id
+			req.models.user.find({ device_id: fields.deviceId[0] }, function (err, rows) {
 				if (err || rows.length == 0) {
 					res.send('0');
 					return;
 				}
 				
+				//userId
+				var userId = rows[0].id;
+				
+				//图片路径
 				var newUserPath = '/user/{id}'.format({
-					id: rows[0].id
+					id: userId
 				});
 				var newFileName = '/face{ext}'.format({
 					ext: file.getFileType(files.img[0].originalFilename)
 				});
 				
 				file.move(files.img[0].path, newUserPath, newFileName, res, function () {
-					var sql = 'UPDATE user SET ' +
-						'name="{name}",img="/upload{path}",phone="{phone}",birthday="{birthday}",sex="{sex}" where device_id="{deviceId}"'.format({
-							name: fields.name[0],
-							path: newUserPath + newFileName,
-							phone: fields.phone[0],
-							birthday: fields.birthday[0],
-							sex: fields.sex[0],
-							deviceId: fields.deviceId[0]
-						});
+					//修改数据
+					var row = rows[0];
 					
-					console.log(sql);
-					
-					req.db.driver.execQuery(sql, function (err) {
+					row.name = fields.name[0];
+					row.phone = fields.phone[0];
+					row.img = uploadPath + newUserPath + newFileName;
+					//可选数据
+					row.birthday = (fields.birthday && fields.birthday[0]) ? fields.birthday[0] : null;
+					row.mail = (fields.mail && fields.mail[0]) ? fields.mail[0] : null;
+					row.sex = (fields.sex && fields.sex[0]) ? fields.sex[0] : null;
+					row.save(function (err) {
 						if (err) {
 							res.send('0');
 							return;
@@ -196,6 +193,26 @@ function User() {
 			if (callBack != undefined) {
 				callBack()
 			}
+		})
+	};
+	
+	this.getIdByDeviceId = function (deviceId, dbDriver, res, callBack) {
+		var sql = 'SELECT id FROM user WHERE device_id={id}'.format({
+			id: deviceId
+		});
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			if (rows.length == 0) {
+				res.send('-1');
+				return;
+			}
+			
+			callBack(rows[0].id)
 		})
 	};
 	
@@ -246,12 +263,12 @@ function User() {
 	};
 	
 	//范围内用户查找(预计废弃)
-	this.getInBound = function (lon, lat, res, callBack) {
+	this.getInBound = function (params, dbDriver, res, callBack) {
 		var sql = '';
 		
 		console.log(sql);
 		
-		connection.query(sql, function (err) {
+		dbDriver.execQuery(sql, function (err) {
 			if (err) {
 				res.send('0');
 				return;
@@ -264,20 +281,18 @@ function User() {
 	};
 	
 	//范围内查找好友
-	this.friendInBound = function (deviceId, lon, lat, res, callBack) {
+	this.friendInBound = function (params, dbDriver, res, callBack) {
 		var sql = '';
 		
 		console.log(sql);
 		
-		connection.query(sql, function (err) {
+		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
 				res.send('0');
 				return;
 			}
 			
-			if (callBack) {
-				callBack()
-			}
+			callBack(rows)
 		})
 	};
 	

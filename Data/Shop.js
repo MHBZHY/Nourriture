@@ -68,32 +68,35 @@ function Shop() {
 			
 			console.log(sql);
 			
-			req.db.driver.execQuery(sql, function (err, end) {
-				if (err || end.length == 0) {
+			req.db.driver.execQuery(sql, function (err, result) {
+				if (err || result.length == 0) {
 					res.send('0');
 					return;
 				}
 				
-				console.log(end);
+				console.log(result);
+				
+				//插入时生成的shopId
+				var shopId = result.insertId;
 				
 				var imgPath = '/shop/{id}'.format({
-					id: end.insertId
+					id: shopId
 				});
 				var imgName = '/background{name}'.format({
 					name: file.getFileType(files.img[0].originalFilename)
 				});
 				var certPath = '/shop/{id}'.format({
-					id: end.insertId
+					id: shopId
 				});
 				var certName = '/certificate{name}'.format({
 					name: file.getFileType(files.certificate[0].originalFilename)
 				});
 				
 				//移动文件
-				file.move(files.img[0].path, '/shop/' + end.insertId + '/', imgName, res, function () {
-					file.move(files.certificate[0].path, '/shop/' + end.insertId + '/', certName, res, function () {
+				file.move(files.img[0].path, imgPath, imgName, res, function () {
+					file.move(files.certificate[0].path, certPath, certName, res, function () {
 						//数据库插入路径
-						req.models.shop.find({id: end.insertId}, function (err, rows) {
+						req.models.shop.find({ id: shopId }, function (err, rows) {
 							if (err || rows.length == 0) {
 								res.send('0');
 								return;

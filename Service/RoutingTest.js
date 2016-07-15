@@ -16,7 +16,7 @@ module.exports.router = function (app) {
 	
 	app.post('/all_user', urlEncodedParser, function (req, res) {
 		user.all(req.models.user, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
@@ -29,7 +29,7 @@ module.exports.router = function (app) {
 	});
 	
 	app.post('/user_update', urlEncodedParser, function (req, res) {
-		user.update(req, res);
+		user.update(req, res)
 	});
 	
 	app.post('/user_login', urlEncodedParser, function (req, res) {
@@ -40,7 +40,7 @@ module.exports.router = function (app) {
 	
 	app.post('/user_id', urlEncodedParser, function (req, res) {
 		user.getById(req.body.id, req.models.user, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		});
 	});
 	
@@ -52,7 +52,7 @@ module.exports.router = function (app) {
 	
 	app.post('/user_deviceId', urlEncodedParser, function (req, res) {
 		user.getByDeviceId(req.body.deviceId, req.models.user, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
@@ -70,7 +70,7 @@ module.exports.router = function (app) {
 	
 	app.post('/shop_all', urlEncodedParser, function (req, res) {
 		shop.all(req.models.shop, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
@@ -87,19 +87,19 @@ module.exports.router = function (app) {
 	
 	app.post('/shop_id', urlEncodedParser, function (req, res) {
 		shop.getById(req.body.id, req.models.shop, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
 	app.post('/shop_name', urlEncodedParser, function (req, res) {
 		shop.getByName(req.body.name, req.models.shop, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
 	app.post('/shop_suggest', urlEncodedParser, function (req, res) {
 		shop.nameSuggest(req.body.name, req.db.driver, res, function (rows) {
-			res.send(rows);
+			res.send(rows)
 		})
 	});
 	
@@ -109,6 +109,32 @@ module.exports.router = function (app) {
 	
 	app.post('/shop_act', urlEncodedParser, function (req, res) {
 		shop.activate(req.body.id, req.models.shop, res);
+	});
+	
+	app.post('/menu_add', urlEncodedParser, function (req, res) {
+		menu.add(req, res);
+	});
+	
+	app.post('/menu_all', urlEncodedParser, function (req, res) {
+		menu.all(req.models.menu, res, function (rows) {
+			res.send(rows)
+		})
+	});
+	
+	app.post('/menu_id', urlEncodedParser, function (req, res) {
+		menu.getById(req.body.id, req.models.menu, res, function (rows) {
+			res.send(rows)
+		})
+	});
+	
+	app.post('/menu_self', urlEncodedParser, function (req, res) {
+		menu.getByUser(req.body.deviceId, req.db.driver, res, function (rows) {
+			res.send(rows)
+		})
+	});
+	
+	app.post('/menu_update', urlEncodedParser, function (req, res) {
+		menu.updateById(req, res);
 	});
 	
 	app.get('/', urlEncodedParser, function (req, res) {
