@@ -232,7 +232,7 @@ function Service() {
 
 	//餐厅搜索建议
 	this.restaurantSearchSuggest = function (req, res) {
-		restaurant.searchSuggest(req.body.name, res, function (rows) {
+		restaurant.nameSuggest(req.body.name, res, function (rows) {
 			res.send(rows);
 		})
 	};

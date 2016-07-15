@@ -145,6 +145,25 @@ function Shop() {
 		});
 	};
 	
+	//搜索建议(名称)
+	this.nameSuggest = function (namePart, dbDriver, res, callBack) {
+		var sql = 'SELECT name, id FROM shop ' +
+			'WHERE name LIKE "%{namePart}%"'.format({
+				namePart: namePart
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return;
+			}
+			
+			callBack(rows);
+		})
+	};
+	
 	//范围内获取餐厅
 	this.searchInBound = function (params, dbDriver, res, callBack) {
 		var sql = '';
@@ -162,25 +181,6 @@ function Shop() {
 		})
 	};
 	
-	//搜索建议(名称)
-	this.searchSuggest = function (namePart, dbDriver, res, callBack) {
-		var sql = 'SELECT name, account id FROM shop ' +
-			'WHERE name LIKE "%{namePart}%"'.format({
-				namePart: namePart
-			});
-		
-		console.log(sql);
-		
-		dbDriver.execQuery(sql, function (err, rows) {
-			if (err) {
-				res.send('0');
-				return;
-			}
-			
-			callBack(rows);
-		})
-	};
-	
 	//封禁/删除
 	this.del = function (id, dbShop, res, callBack) {
 		dbShop.find({ id: id }, function (err, rows) {
@@ -189,6 +189,7 @@ function Shop() {
 				return;
 			}
 			
+			//设置del为1, 表示被封禁
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
@@ -196,29 +197,13 @@ function Shop() {
 					return;
 				}
 				
+				res.send('1');
+				
 				if (callBack) {
 					callBack();
 				}
 			})
 		});
-		
-		
-		// var sql = 'UPDATE shop SET del = 1 WHERE account="{account}"'.format({
-		// 	account: account
-		// });
-		//
-		// console.log(sql);
-		//
-		// connection.query(sql, function (err) {
-		// 	if (err) {
-		// 		res.send('0');
-		// 		return;
-		// 	}
-		//
-		// 	if (callBack) {
-		// 		callBack();
-		// 	}
-		// })
 	};
 	
 	//激活
@@ -229,6 +214,7 @@ function Shop() {
 				return;
 			}
 			
+			//设置del为0, 表示已激活
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
@@ -236,29 +222,13 @@ function Shop() {
 					return;
 				}
 				
+				res.send('1');
+				
 				if (callBack) {
 					callBack();
 				}
 			})
 		});
-		
-		
-		// var sql = 'UPDATE shop SET del = 0 WHERE account="{account}"'.format({
-		// 	account: account
-		// });
-		//
-		// console.log(sql);
-		//
-		// connection.query(sql, function (err) {
-		// 	if (err) {
-		// 		res.send('0');
-		// 		return;
-		// 	}
-		//
-		// 	if (callBack) {
-		// 		callBack();
-		// 	}
-		// })
 	};
 	
 	//注销

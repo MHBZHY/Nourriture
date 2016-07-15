@@ -97,6 +97,20 @@ module.exports.router = function (app) {
 		})
 	});
 	
+	app.post('/shop_suggest', urlEncodedParser, function (req, res) {
+		shop.nameSuggest(req.body.name, req.db.driver, res, function (rows) {
+			res.send(rows);
+		})
+	});
+	
+	app.post('/shop_del', urlEncodedParser, function (req, res) {
+		shop.del(req.body.id, req.models.shop, res);
+	});
+	
+	app.post('/shop_act', urlEncodedParser, function (req, res) {
+		shop.activate(req.body.id, req.models.shop, res);
+	});
+	
 	app.get('/', urlEncodedParser, function (req, res) {
 		res.render('index_test');
 	})
