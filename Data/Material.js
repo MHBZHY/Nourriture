@@ -48,7 +48,7 @@ function Material() {
 						self.addForMenuId({
 							menuId: fields.id[0],
 							materialId: materialId
-						}, req.models.menu_material, res);
+						}, req.models.menu_material, res, callBack);
 						// req.models.menu_material.create({
 						// 	menu_id: fields.id[0],
 						// 	material_id: materialId
