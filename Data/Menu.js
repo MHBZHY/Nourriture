@@ -12,94 +12,100 @@ function Menu() {
 	
 	
 	//上传菜谱
-	this.add = function (req, res, callBack) {
-		//解析二进制数据
-		file.parse(req, res, function (fields, files) {
-			//创建新菜单
-			req.models.menu.create({
-				name: fields.name[0],
-				price: fields.price[0],
-				description: fields.description[0],
-				type: fields.type[0],
-				del: 0
-			}, function (err, rows) {
-				if (err) {
-					res.send('0');
-					return
-				}
-				
-				//插入时创建的id
-				var menuId = rows.id;
-				
-				//处理上传文件
-				var imgPath = '/menu/{id}'.format({
-					id: menuId
-				});
-				var imgName = '/img{name}'.format({
-					name: file.getFileType(files.img[0].originalFilename)
-				});
-				
-				//移动文件
-				file.move(files.img[0].path, imgPath, imgName, res, function () {
-					//将图片路径插入数据库
-					req.models.menu.find({id: menuId}, function (err, rows) {
-						if (err || rows.length == 0) {
+	this.add = function (dbMenu, dbMenu_Shop_User, fields, files, res, callBack) {
+		//创建新菜单
+		dbMenu.create({
+			name: fields.name[0],
+			price: fields.price[0],
+			description: fields.description[0],
+			type: fields.type[0],
+			del: 0
+		}, function (err, row) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			//插入时创建的id
+			var menuId = row.id;
+			
+			//处理上传文件
+			var imgPath = '/menu/{id}'.format({
+				id: menuId
+			});
+			var imgName = '/img{name}'.format({
+				name: file.getFileType(files.img[0].originalFilename)
+			});
+			
+			//移动文件
+			file.move(files.img[0].path, imgPath, imgName, res, function () {
+				//将图片路径插入数据库
+				dbMenu.find({id: menuId}, function (err, rows) {
+					if (err || rows.length == 0) {
+						res.send('0');
+						return
+					}
+					
+					//插入路径
+					rows[0].img = uploadPath + imgPath + imgName;
+					rows[0].save(function (err) {
+						if (err) {
 							res.send('0');
 							return
 						}
 						
-						//插入路径
-						rows[0].img = uploadPath + imgPath + imgName;
-						rows[0].save(function (err) {
-							if (err) {
-								res.send('0');
-								return
-							}
-							
-							//根据上传者建立关系
-							if (fields.deviceId || fields.deviceId[0]) {
-								//获取用户id
-								user.getIdByDeviceId(fields.deviceId[0], req.db.driver, res, function (userId) {
-									//用户上传
-									req.models.menu_shop_user.create({
-										menu_id: menuId,
-										user_id: userId
-									}, function (err) {
-										if (err) {
-											res.send('0');
-											return
-										}
-										
-										res.send('1');
-										
-										if (callBack) {
-											callBack()
-										}
-									})
-								})
-							}
-							else {
-								//商家上传
-								req.models.menu_shop_user.create({
-									menu_id: menuId,
-									shop_id: req.session.shopId
-								}, function (err) {
-									if (err) {
-										res.send('0');
-										return
-									}
-									
-									res.send('1');
-									
-									if (callBack) {
-										callBack()
-									}
-								})
-							}
-						})
+						callBack(menuId)
 					})
 				})
 			})
+		})
+	};
+	
+	this.bindWithUser = function (dbMenu_Shop_User, menuId, userId, res, callBack) {
+		//用户上传
+		dbMenu_Shop_User.create({
+			menu_id: menuId,
+			user_id: userId
+		}, function (err) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack()
+		})
+	};
+	
+	this.getTypeListWithShopId = function (shopId, dbDriver, res, callBack) {
+		var sql = 'SELECT DISTINCT menu.type FROM menu_shop_user msu, menu ' +
+			'WHERE msu.menu_id=menu.id AND msu.shop_id={shopId}'.format({
+				shopId: shopId
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
+		})
+	};
+	
+	this.bindWithShop = function (dbMenu_Shop_User, menuId, shopId, res, callBack) {
+		//商家上传
+		dbMenu_Shop_User.create({
+			menu_id: menuId,
+			shop_id: shopId
+		}, function (err) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack()
 		})
 	};
 	
@@ -118,15 +124,37 @@ function Menu() {
 		})
 	};
 	
-	//获取单个菜单
-	this.getById = function (menuId, dbMenu, res, callBack) {
-		dbMenu.find({id: menuId, del: 0 }, function (err, rows) {
+	this.allWithPageMode = function (dbMenu, page, amount, res, callBack) {
+		dbMenu.find({ del: 0 }).limit(amount).offset(page).run(function (err, rows) {
 			if (err) {
 				res.send('0');
 				return
 			}
 			
 			callBack(rows)
+		})
+	};
+	
+	//获取单个菜单
+	this.getById = function (menuId, dbMenu, res, callBack) {
+		dbMenu.find({ id: menuId, del: 0 }, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows[0])
+		})
+	};
+	
+	this.getByName = function (name, dbMenu, res, callBack) {
+		dbMenu.find({ name: name, del: 0 }, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows[0])
 		})
 	};
 	
@@ -157,7 +185,32 @@ function Menu() {
 			});
 		
 		dbDriver.execQuery(sql, function (err, rows) {
-			if (err) {
+			if (err || rows.length == 0) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
+		})
+	};
+	
+	//todo: 分页返回商家菜单
+	// this.getByShopPageMode = function (shopId, page, amount, dbMenu, dbMenu_Shop_User, res, callBack) {
+	//
+	// }
+	
+	//获取餐厅菜单(按分类)
+	this.getByShopWithType = function (shopId, type, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE menu.type={type} AND msu.shop_id={shopId} AND menu.del=0'.format({
+				type: type,
+				shopId: shopId
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
 				res.send('0');
 				return
 			}

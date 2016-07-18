@@ -23,8 +23,9 @@ module.exports.parse = function (app) {
 		service.userRegister(req, res)
 	});
 	
-	app.post('/shop_register', urlEncodedParser, function (req, res) {
-		service.shopRegister(req, res)
+	//更新用户信息
+	app.post('/user_update', urlEncodedParser, function (req, res) {
+		service.userUpdate(req, res);
 	});
 	
 	//用户名是否存在
@@ -32,33 +33,83 @@ module.exports.parse = function (app) {
 		service.regNameExist(req, res)
 	});
 	
-	//注销
-	app.post('/logout', urlEncodedParser, function (req, res) {
-		service.logout(req, res);
-	});
-	
 	//获取用户信息
 	app.post('/user', urlEncodedParser, function (req, res) {
 		service.userInfo(req, res);
 	});
 	
-	//更新用户信息
-	app.post('/user_update', urlEncodedParser, function (req, res) {
-		service.userUpdate(req, res);
+	//获取一定范围内好友位置
+	//bound: meters
+	//pointer: [longitude: double, latitude: double]
+	app.post('/friend_in_bound', urlEncodedParser, function (req, res) {
+		service.friendInBound(req, res);
 	});
 	
+	//获取好友
+	app.post('/friend', urlEncodedParser, function (req, res) {
+		
+	});
+	
+	//注销
+	app.post('/logout', urlEncodedParser, function (req, res) {
+		service.logout(req, res);
+	});
+	
+	//餐厅注册
+	app.post('/shop_register', urlEncodedParser, function (req, res) {
+		service.shopRegister(req, res)
+	});
+	
+	//获取餐厅信息
+	app.post('/shop', urlEncodedParser, function (req, res) {
+		service.shopInfo(req, res);
+	});
+	
+	//获取餐厅搜索建议
+	//name: string
+	app.post('/shop_search', urlEncodedParser, function (req, res) {
+		service.shopSearchSuggest(req, res);
+	});
+	
+	//更新餐厅信息
+	app.post('/shop_update', urlEncodedParser, function (req, res) {
+		
+	});
+	
+	//获取一定范围内的餐厅信息
+	//bound: meters
+	//pointer: [longitude: double, latitude: double]
+	app.post('/shop_in_bound', urlEncodedParser, function (req, res) {
+		service.shopInBound(req, res);
+	});
+	
+	//获取一定范围内用户(所有用户)位置
+	//废弃
+	// app.post('/user_in_bound', urlEncodedParser, function (req, res) {
+	//    service.userInBound(req, res);
+	// });
 	//获取菜单(附编号范围, ex: 1, 10, 表示1到10编号的菜单)
 	app.post('/menu', urlEncodedParser, function (req, res) {
-		service.menus(req, res);
+		service.menuInfo(req, res);
+	});
+	
+	//菜单分类
+	app.post('/menu_type', urlEncodedParser, function (req, res) {
+		service.menuType(req, res)
+	});
+	
+	//搜索建议
+	app.post('/menu_search', urlEncodedParser, function (req, res) {
+		
 	});
 	
 	//获取个人菜单
-	app.post('/menu_self', urlEncodedParser, function (req, res) {
-		service.selfMenus(req, res);
-	});
+	// app.post('/menu_self', urlEncodedParser, function (req, res) {
+	// 	service.selfMenus(req, res);
+	// });
 	
 	//上传菜单
-	app.post('/menu_add', urlEncodedParser, function (req, res) {
+	app.post('/menu_upload', urlEncodedParser, function (req, res) {
 		service.menuAdd(req, res);
 	});
 	
@@ -76,37 +127,6 @@ module.exports.parse = function (app) {
 		service.menuEvaluate(req, res);
 	});
 	
-	//获取商户信息
-	app.post('/restaurant', urlEncodedParser, function (req, res) {
-		service.shopInfo(req, res);
-	});
-	
-	//获取餐厅搜索建议
-	//name: string
-	app.post('/restaurant_search', urlEncodedParser, function (req, res) {
-		service.restaurantSearchSuggest(req, res);
-	});
-	
-	
-	//获取一定范围内的餐厅信息
-	//bound: meters
-	//pointer: [longitude: double, latitude: double]
-	app.post('/restaurant_in_bound', urlEncodedParser, function (req, res) {
-		service.restaurantInBound(req, res);
-	});
-	
-	//获取一定范围内好友位置
-	//bound: meters
-	//pointer: [longitude: double, latitude: double]
-	app.post('/friend_in_bound', urlEncodedParser, function (req, res) {
-		service.friendInBound(req, res);
-	});
-	
-	//获取一定范围内用户(所有用户)位置
-	//废弃
-	// app.post('/user_in_bound', urlEncodedParser, function (req, res) {
-	//    service.userInBound(req, res);
-	// });
 	
 	//创建订单
 	
@@ -138,7 +158,16 @@ module.exports.parse = function (app) {
 		res.render('index');
 	});
 	
-	app.get('/show.html', urlEncodedParser, function (req, res) {
-		res.render('show');
-	})
+	//admin
+	app.get('/admin', urlEncodedParser, function (req, res) {
+		res.redirect('/admin/login.html')
+	});
+	
+	// app.get('/', urlEncodedParser, function (req, res) {
+	// 	res.sendFile(path.join(__dirname, '../Public/admin/admin.html'))
+	// });
+	
+	// app.get('/show.html', urlEncodedParser, function (req, res) {
+	// 	res.render('show');
+	// })
 };

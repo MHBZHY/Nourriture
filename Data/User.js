@@ -81,11 +81,7 @@ function User() {
 			
 			console.log(rows);
 			
-			res.send('1');
-			
-			if (callBack) {
-				callBack()
-			}
+			callBack(rows[0].id)
 		})
 	};
 	
@@ -216,11 +212,7 @@ function User() {
 				return
 			}
 			
-			res.send('1');
-			
-			if (callBack != undefined) {
-				callBack()
-			}
+			callBack()
 		})
 	};
 	
@@ -424,9 +416,9 @@ function User() {
 	};
 	
 	//管理员登陆
-	this.admin = function (params, session, dbAdmin, res, callBack) {
+	this.admin = function (params, dbAdmin, res, callBack) {
 		dbAdmin.find({
-			id: params.id,
+			id: params.name,
 			password: params.password
 		}, function (err, rows) {
 			if (err) {
@@ -439,13 +431,7 @@ function User() {
 				return
 			}
 			
-			//设置session
-			session.admin = 1;
-			res.send('1');
-			
-			if (callBack) {
-				callBack();
-			}
+			callBack()
 		});
 	}
 }

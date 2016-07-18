@@ -155,6 +155,13 @@ module.exports.router = function (app) {
 		menu.activate(req.body.id, req.models.menu, res);
 	});
 	
+	app.post('/menu_page', urlEncodedParser, function (req, res) {
+		menu.allWithPageMode(req.models.menu, req.body.page, req.body.amount, res, function (rows) {
+			console.log(rows);
+			res.send(rows)
+		})
+	});
+	
 	app.get('/', urlEncodedParser, function (req, res) {
 		res.render('index_test');
 	})

@@ -51,8 +51,8 @@ app.set('views', __dirname + '/Public/view');
 require('./Service/Tools').stringFormat();
 
 //注册post处理
-// require('./Service/Routing').parse(app);
-require('./Service/RoutingTest').router(app);
+require('./Service/Routing').parse(app);
+// require('./Service/RoutingTest').router(app);
 
 //启动服务器
 app.listen(8088, function () {

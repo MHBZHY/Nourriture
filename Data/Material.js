@@ -8,65 +8,62 @@ function Material() {
 	var file = require('../Service/File');
 	var uploadPath = '/upload';
 	
-	//添加原料, 并加入菜单
-	this.addWithMenuId = function (req, res, callBack) {
-		//解析二进制数据
-		file.parse(req, res, function (fields, file) {
-			req.models.material.create({
-				name: fields.name[0],
-				nutrition_value: fields.nutrition_value[0],
-				del: 0
-			}, function (err, rows) {
-				if (err) {
-					res.send('0');
-					return
-				}
+	//添加原料
+	this.add = function (dbMaterial, fields, files, res, callBack) {
+		dbMaterial.create({
+			name: fields.name[0],
+			nutrition_value: fields.nutrition_value[0],
+			del: 0
+		}, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			//materialId
+			var materialId = rows[0].id;
+			
+			//图片路径
+			var newPath = '/material/{id}'.format({
+				id: materialId
+			});
+			var newFileName = '/img{ext}'.format({
+				ext: file.getFileType(files.img[0].originalFilename)
+			});
+			
+			file.move(files.img[0].path, newPath, newFileName, res, function () {
+				//修改数据
+				var row = rows[0];
 				
-				//materialId
-				var materialId = rows[0].id;
-				
-				//图片路径
-				var newPath = '/material/{id}'.format({
-					id: materialId
-				});
-				var newFileName = '/img{ext}'.format({
-					ext: file.getFileType(files.img[0].originalFilename)
-				});
-				
-				file.move(files.img[0].path, newPath, newFileName, res, function () {
-					//修改数据
-					var row = rows[0];
+				row.img = uploadPath + newPath + newFileName;
+				row.save(function (err) {
+					if (err) {
+						res.send('0');
+						return
+					}
 					
-					row.img = uploadPath + newPath + newFileName;
-					row.save(function (err) {
-						if (err) {
-							res.send('0');
-							return
-						}
-						
-						//与菜单建立关系
-						self.addForMenuId({
-							menuId: fields.id[0],
-							materialId: materialId
-						}, req.models.menu_material, res, callBack);
-						// req.models.menu_material.create({
-						// 	menu_id: fields.id[0],
-						// 	material_id: materialId
-						// }, function (err) {
-						// 	if (err) {
-						// 		res.send('0');
-						// 		return
-						// 	}
-						//
-						// 	res.send('1');
-						//
-						// 	if (callBack) {
-						// 		callBack();
-						// 	}
-						// })
-					})
+					res.send('1');
+					
+					if (callBack) {
+						callBack(materialId)
+					}
 				})
 			})
+		})
+	};
+	
+	//添加至菜单
+	this.bindWithMenuId = function (materialId, menuId, dbMenu_Material, res, callBack) {
+		dbMenu_Material.create({
+			material_id: materialId,
+			menu_id: menuId
+		}, function (err) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack()
 		})
 	};
 	

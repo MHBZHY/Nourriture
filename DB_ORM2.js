@@ -25,7 +25,7 @@ module.exports.createOrmConnection = function (app) {
 				score: Number,
 				del: Number
 			});
-			models.menu_material = define('menu_material', {
+			models.menu_material = db.define('menu_material', {
 				menu_id: Number,
 				material_id: Number
 			});
