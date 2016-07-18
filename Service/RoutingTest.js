@@ -128,7 +128,7 @@ module.exports.router = function (app) {
 	});
 	
 	app.post('/menu_self', urlEncodedParser, function (req, res) {
-		menu.getByUser(req.body.deviceId, req.db.driver, res, function (rows) {
+		menu.getByUserDevice(req.body.deviceId, req.db.driver, res, function (rows) {
 			res.send(rows)
 		})
 	});
@@ -158,6 +158,23 @@ module.exports.router = function (app) {
 	app.post('/menu_page', urlEncodedParser, function (req, res) {
 		menu.allWithPageMode(req.models.menu, req.body.page, req.body.amount, res, function (rows) {
 			console.log(rows);
+			res.send(rows)
+		})
+	});
+	
+	app.post('/shop_exist', urlEncodedParser, function (req, res) {
+		shop.nameIsExist(req.body.name, req.models.shop, res, function (bool) {
+			if (bool) {
+				res.send(JSON.stringify(1))
+			}
+			else {
+				res.send(JSON.stringify(-1))
+			}
+		})
+	});
+	
+	app.post('/menu_shop', urlEncodedParser, function (req, res) {
+		menu.getByShopPageMode(req.body.id, req.body.page, req.body.amount, req.db.driver, res, function (rows) {
 			res.send(rows)
 		})
 	});

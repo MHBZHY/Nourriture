@@ -25,7 +25,7 @@ module.exports.parse = function (app) {
 	
 	//更新用户信息
 	app.post('/user_update', urlEncodedParser, function (req, res) {
-		service.userUpdate(req, res);
+		service.userUpdate(req, res)
 	});
 	
 	//用户名是否存在
@@ -47,12 +47,12 @@ module.exports.parse = function (app) {
 	
 	//获取好友
 	app.post('/friend', urlEncodedParser, function (req, res) {
-		
+		//todo: 获取好友
 	});
 	
 	//注销
 	app.post('/logout', urlEncodedParser, function (req, res) {
-		service.logout(req, res);
+		service.logout(req, res)
 	});
 	
 	//餐厅注册
@@ -62,7 +62,7 @@ module.exports.parse = function (app) {
 	
 	//获取餐厅信息
 	app.post('/shop', urlEncodedParser, function (req, res) {
-		service.shopInfo(req, res);
+		service.shopInfo(req, res)
 	});
 	
 	//获取餐厅搜索建议
@@ -73,7 +73,7 @@ module.exports.parse = function (app) {
 	
 	//更新餐厅信息
 	app.post('/shop_update', urlEncodedParser, function (req, res) {
-		
+		//todo: 更新shop信息
 	});
 	
 	//获取一定范围内的餐厅信息
@@ -83,11 +83,6 @@ module.exports.parse = function (app) {
 		service.shopInBound(req, res);
 	});
 	
-	//获取一定范围内用户(所有用户)位置
-	//废弃
-	// app.post('/user_in_bound', urlEncodedParser, function (req, res) {
-	//    service.userInBound(req, res);
-	// });
 	//获取菜单(附编号范围, ex: 1, 10, 表示1到10编号的菜单)
 	app.post('/menu', urlEncodedParser, function (req, res) {
 		service.menuInfo(req, res);
@@ -103,11 +98,6 @@ module.exports.parse = function (app) {
 		
 	});
 	
-	//获取个人菜单
-	// app.post('/menu_self', urlEncodedParser, function (req, res) {
-	// 	service.selfMenus(req, res);
-	// });
-	
 	//上传菜单
 	app.post('/menu_upload', urlEncodedParser, function (req, res) {
 		service.menuAdd(req, res);
@@ -116,6 +106,21 @@ module.exports.parse = function (app) {
 	//修改菜单
 	app.post('/menu_update', urlEncodedParser, function (req, res) {
 		service.menuUpdate(req, res);
+	});
+	
+	//删除菜单
+	app.post('/menu_delete', urlEncodedParser, function (req, res) {
+		service.menuDel(req, res)
+	});
+	
+	//删除菜单中某一原料
+	app.post('/menu_delete_material', urlEncodedParser, function (req, res) {
+		//todo: 删除菜单中某一原料
+	});
+	
+	//向菜单中添加现成的原料
+	app.post('/menu_add_material', urlEncodedParser, function (req, res) {
+		//todo: 向菜单中添加现成原料
 	});
 	
 	//点评菜单
@@ -127,47 +132,53 @@ module.exports.parse = function (app) {
 		service.menuEvaluate(req, res);
 	});
 	
+	//获得菜单评价
+	app.post('/menu_get_evaluate', urlEncodedParser, function (req, res) {
+		//todo: 获得菜单评价
+	});
+	
+	//获得原料
+	app.post('/material', urlEncodedParser, function (req, res) {
+		service.material(req, res)
+	});
+	
+	//添加原料
+	app.post('/material_add', urlEncodedParser, function (req, res) {
+		//todo: 添加原料
+	});
+	
+	//修改原料
+	app.post('/material_update', urlEncodedParser, function (req, res) {
+		//todo: 修改原料
+	});
 	
 	//创建订单
 	
 	
 	//封禁
 	app.post('/admin_del', urlEncodedParser, function (req, res) {
-		service.adminForbid(req, res);
+		service.adminForbid(req, res)
 	});
 	
 	//激活
 	app.post('/admin_act', urlEncodedParser, function (req, res) {
-		service.adminActivate(req, res);
-	});
-	
-	//获得原料
-	app.post('/material', urlEncodedParser, function (req, res) {
-		service.material(req, res);
+		service.adminActivate(req, res)
 	});
 	
 	
 	//以下为get请求
 	//访问web主页
 	app.get('/', urlEncodedParser, function (req, res) {
-		res.render('index');
+		res.render('index')
 	});
 	
 	//主页
 	app.get('/index.html', urlEncodedParser, function (req, res) {
-		res.render('index');
+		res.render('index')
 	});
 	
 	//admin
 	app.get('/admin', urlEncodedParser, function (req, res) {
 		res.redirect('/admin/login.html')
-	});
-	
-	// app.get('/', urlEncodedParser, function (req, res) {
-	// 	res.sendFile(path.join(__dirname, '../Public/admin/admin.html'))
-	// });
-	
-	// app.get('/show.html', urlEncodedParser, function (req, res) {
-	// 	res.render('show');
-	// })
+	})
 };

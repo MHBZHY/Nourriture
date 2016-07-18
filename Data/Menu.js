@@ -159,7 +159,7 @@ function Menu() {
 	};
 	
 	//获取用户自己的菜单
-	this.getByUser = function (deviceId, dbDriver, res, callBack) {
+	this.getByUserDevice = function (deviceId, dbDriver, res, callBack) {
 		user.getIdByDeviceId(deviceId, dbDriver, res, function (userId) {
 			var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
 				'WHERE menu.id=msu.menu_id AND msu.user_id={id} AND menu.del=0'.format({
@@ -177,10 +177,26 @@ function Menu() {
 		})
 	};
 	
+	this.getByUserId = function (id, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE menu.id=msu.menu_id AND msu.user_id={id} AND menu.del=0'.format({
+				id: id
+			});
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
+		})
+	};
+	
 	//获取餐厅自己的菜单
 	this.getByShop = function (shopId, dbDriver, res, callBack) {
 		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
-			'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0'.format({
+			'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
 				shopId: shopId
 			});
 		
@@ -195,9 +211,25 @@ function Menu() {
 	};
 	
 	//todo: 分页返回商家菜单
-	// this.getByShopPageMode = function (shopId, page, amount, dbMenu, dbMenu_Shop_User, res, callBack) {
-	//
-	// }
+	this.getByShopPageMode = function (shopId, page, amount, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+				shopId: shopId
+			}) +
+			'limit {start},{end}'.format({
+				start: page * amount,
+				end: (page + 1) * amount
+			});
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
+		})
+	};
 	
 	//获取餐厅菜单(按分类)
 	this.getByShopWithType = function (shopId, type, dbDriver, res, callBack) {
@@ -205,6 +237,29 @@ function Menu() {
 			'WHERE menu.type={type} AND msu.shop_id={shopId} AND menu.del=0'.format({
 				type: type,
 				shopId: shopId
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send('0');
+				return
+			}
+			
+			callBack(rows)
+		})
+	};
+	
+	this.getByShopWithTypePageMode = function (shopId, type, page, amount, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE menu.type={type} AND msu.shop_id={shopId} AND menu.del=0 '.format({
+				type: type,
+				shopId: shopId
+			}) +
+			'limit {start},{end}'.format({
+				start: page * amount,
+				end: (page + 1) * amount
 			});
 		
 		console.log(sql);

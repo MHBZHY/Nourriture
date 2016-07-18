@@ -44,24 +44,26 @@ function Shop() {
 	};
 	
 	//账户是否存在
-	this.isExist = function () {
-		
-	};
-	
-	//名称是否存在
-	this.nameIsExist = function (name, dbShop, res, callBack) {
-		dbShop.exists({ name: name }, function (err, count) {
+	this.isExist = function (id, dbShop, res, callBack) {
+		dbShop.exists({ id: id }, function (err, isExist) {
 			if (err) {
-				res.send('-1');
-				return
-			}
-			
-			if (!count) {
 				res.send('0');
 				return
 			}
 			
-			callBack()
+			callBack(isExist)
+		})
+	};
+	
+	//名称是否存在
+	this.nameIsExist = function (name, dbShop, res, callBack) {
+		dbShop.exists({ name: name }, function (err, bool) {
+			if (err) {
+				res.send('0');
+				return
+			}
+			
+			callBack(bool)
 		})
 	};
 	
