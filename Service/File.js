@@ -16,15 +16,15 @@ function File() {
 		//解析二进制表单
 		form.parse(req, function (err, fields, files) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			console.log(fields + files);
 
 			//解析出的非二进制字段及文件
 			callBack(fields, files);
-		})
+		});
 	};
 
 	this.move = function (oldPath, newPath, fileName, res, callBack) {
@@ -46,17 +46,17 @@ function File() {
 				if (!fs.existsSync(dirPath)) {
 					fs.mkdirSync(dirPath);
 				}
-			})
+			});
 		}
 
 		fs.rename(oldPath, uploadPath + newPath + fileName, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack();
-		})
+		});
 	};
 	
 	this.getFileType = function (fileName) {

@@ -38,7 +38,7 @@ d="M63 0v750h375v-750h-375zM125 63h250v625h-250v-625z" />
  />
     <glyph glyph-name=".null" 
  />
-    <glyph glyph-name="nonmarkingreturn" horiz-adv-x="333" 
+    <glyph glyph-name="nonmarkingreturn;" horiz-adv-x="333"
  />
     <glyph glyph-name="uni000A" unicode="&#xa;" horiz-adv-x="214" 
  />

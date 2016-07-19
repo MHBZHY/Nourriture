@@ -83,6 +83,11 @@ module.exports.parse = function (app) {
 		service.shopInBound(req, res);
 	});
 	
+	//发布消息
+	app.post('/ads', urlEncodedParser, function (req, res) {
+		service.ads(req, res)
+	});
+	
 	//获取菜单(附编号范围, ex: 1, 10, 表示1到10编号的菜单)
 	app.post('/menu', urlEncodedParser, function (req, res) {
 		service.menuInfo(req, res);
@@ -180,5 +185,5 @@ module.exports.parse = function (app) {
 	//admin
 	app.get('/admin', urlEncodedParser, function (req, res) {
 		res.redirect('/admin/login.html')
-	})
+	});
 };

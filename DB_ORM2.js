@@ -78,7 +78,7 @@ module.exports.createOrmConnection = function (app) {
 			models.admin = db.define('admin', {
 				id: Number,
 				password: String
-			})
+			});
 		}
 	}))
 };

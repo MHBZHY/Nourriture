@@ -9,7 +9,8 @@ function User() {
 	var uploadPath = '/upload';
 	
 	
-	//验证密码, 返回id
+	
+	// 验证密码, 返回id
 	this.authByName = function (params, dbDriver, res, callBack) {
 		var sql = 'select id, password from user where ' +
 			'name="{name}"'.format({
@@ -20,22 +21,22 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');    //unknown error
-				return
+				res.send(JSON.stringify(0));    //unknown error
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');   //user not found
-				return
+				res.send(JSON.stringify(-1));   //user not found
+				return;
 			}
 			
 			if (rows[0].password != params.password) {
-				res.send('-2'); //password error
-				return
+				res.send(JSON.stringify(-2));   //password error
+				return;
 			}
 			
 			callBack(rows[0].id);
-		})
+		});
 	};
 	
 	this.authByPhone = function (params, dbDriver, res, callBack) {
@@ -48,22 +49,22 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');    //unknown error
-				return
+				res.send(JSON.stringify(0));    //unknown error
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');   //user not found
-				return
+				res.send(JSON.stringify(-1));   //user not found
+				return;
 			}
 			
 			if (rows[0].password != params.password) {
-				res.send('-2'); //password error
-				return
+				res.send(JSON.stringify(-2)); //password error
+				return;
 			}
 			
 			callBack(rows[0].id);
-		})
+		});
 	};
 	
 	//注册
@@ -75,26 +76,26 @@ function User() {
 			del: 0
 		}, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			console.log(rows);
+			// console.log(rows);
 			
 			callBack(rows[0].id)
-		})
+		});
 	};
 	
 	//所有信息
 	this.all = function (dbUser, res, callBack) {
 		dbUser.find(function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//用户是否存在
@@ -102,12 +103,12 @@ function User() {
 		if (params.id) {
 			dbUser.exists({ id: params.id }, function (err, count) {
 				if (err || !count) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
 				callBack()
-			})
+			});
 		}
 	};
 	
@@ -115,37 +116,17 @@ function User() {
 	this.nameIsExist = function (name, dbUser, res, callBack) {
 		dbUser.exists({ name: name }, function (err, count) {
 			if (err) {
-				res.send('-1');
-				return
+				res.send(JSON.stringify(-1));
+				return;
 			}
 			
 			if (!count) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack()
 		});
-		
-		// var sql = 'select name from user where name={name}'.format({
-		// 	name: name
-		// });
-		//
-		// console.log(sql);
-		//
-		// dbDriver.execQuery(sql, function (err, rows) {
-		// 	if (err) {
-		// 		res.send('0');
-		// 		return
-		// 	}
-		//
-		// 	if (rows.length == 0) {
-		// 		res.send('-1');
-		// 		return
-		// 	}
-		//
-		// 	res.send('1');
-		// })
 	};
 	
 	//更新信息
@@ -154,8 +135,8 @@ function User() {
 			//得到用户id
 			req.models.user.find({ device_id: fields.deviceId[0] }, function (err, rows) {
 				if (err || rows.length == 0) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
 				//userId
@@ -182,19 +163,15 @@ function User() {
 					row.sex = (fields.sex && fields.sex[0]) ? fields.sex[0] : null;
 					row.save(function (err) {
 						if (err) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
-						res.send('1');
-						
-						if (callBack) {
-							callBack()
-						}
-					})
-				})
-			})
-		})
+						callBack()
+					});
+				});
+			});
+		});
 	};
 	
 	//绑定设备
@@ -208,12 +185,12 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack()
-		})
+		});
 	};
 	
 	this.getIdByDeviceId = function (deviceId, dbDriver, res, callBack) {
@@ -223,63 +200,63 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-10');    //未登录
-				return
+				res.send(JSON.stringify(-10));    //未登录
+				return;
 			}
 			
 			callBack(rows[0].id)
-		})
+		});
 	};
 	
 	//根据id获取信息
-	this.getById = function (id, dbUser, res, callBack) {
+	this.getInfoById = function (id, dbUser, res, callBack) {
 		dbUser.find({ id: id }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//根据昵称获取信息
-	this.getByName = function (name, dbUser, res, callBack) {
+	this.getInfoByName = function (name, dbUser, res, callBack) {
 		dbUser.find({ name: name }, function (err, rows) {
 			if (err) {
-				res.send('0');  //内部错误
-				return
+				res.send(JSON.stringify(0));  //内部错误
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1'); //未找到
-				return
+				res.send(JSON.stringify(-1)); //未找到
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//根据deviceid获取信息
 	this.getByDeviceId = function (deviceId, dbUser, res, callBack) {
 		dbUser.find({ device_id: deviceId }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');
-				return
+				res.send(JSON.stringify(-1));
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//范围内用户查找(预计废弃)
@@ -290,14 +267,12 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			if (callBack) {
-				callBack()
-			}
-		})
+			callBack()
+		});
 	};
 	
 	//获得好友
@@ -313,12 +288,12 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//范围内查找好友
@@ -329,40 +304,36 @@ function User() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//封禁/删除
 	this.del = function (userId, dbUser, res, callBack) {
 		dbUser.find({ id: userId }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');
-				return
+				res.send(JSON.stringify(-1));
+				return;
 			}
 			
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
-				
-				if (callBack) {
-					callBack();
-				}
-			})
+				callBack()
+			});
 		});
 	};
 	
@@ -370,28 +341,24 @@ function User() {
 	this.activate = function (userId, dbUser, res, callBack) {
 		dbUser.find({ id: userId }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');
-				return
+				res.send(JSON.stringify(-1));
+				return;
 			}
 			
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
-				
-				if (callBack) {
-					callBack();
-				}
-			})
+				callBack()
+			});
 		});
 	};
 	
@@ -403,16 +370,12 @@ function User() {
 
 		dbDriver.execQuery(sql, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			res.send('1');
-			
-			if (callBack) {
-				callBack()
-			}
-		})
+			callBack()
+		});
 	};
 	
 	//管理员登陆
@@ -422,13 +385,13 @@ function User() {
 			password: params.password
 		}, function (err, rows) {
 			if (err) {
-				res.send('0');  //内部错误
-				return
+				res.send(JSON.stringify(0));  //内部错误
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1'); //密码错误
-				return
+				res.send(JSON.stringify(-1)); //密码错误
+				return;
 			}
 			
 			callBack()

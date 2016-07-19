@@ -8,75 +8,119 @@ function Shop() {
 	var file = require('../Service/File');
 	var uploadPath = '/upload';
 	
-	
-	//根据name验证
-	this.authByName = function (name, password, dbDriver, res, callBack) {
-		var sql = 'SELECT id, password, del FROM shop ' +
-			'WHERE name="{name}"'.format({
-				name: name
-			});
-		
-		console.log(sql);
-		
-		dbDriver.execQuery(sql, function (err, rows) {
-			if (err) {
-				res.send('0');    //internal error
-				return
+	/*
+	餐厅添加公告
+	 */
+	this.addAds = function (shopId, ads, dbShop, res, callBack) {
+		dbShop.find({ id: shopId }, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			if (rows[0].del == 1) {
-				res.send('-9');     //被封禁
-				return
+			rows[0].ads = ads;
+			rows[0].save(function (err) {
+				if (err) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				callBack()
+			});
+		});
+	};
+	
+	//根据name验证
+	this.authByName = function (name, password, dbShop, res, callBack) {
+		// var sql = 'SELECT id, password, del FROM shop ' +
+		// 	'WHERE name="{name}"'.format({
+		// 		name: name
+		// 	});
+		//
+		// console.log(sql);
+		
+		dbShop.find({ name: name, del: 0}).only(['id', 'password']).run(function (err, rows) {
+			if (err) {
+				res.send(JSON.stringify(0));    //internal error
+				return;
 			}
 			
 			if (rows.length == 0) {
-				res.send('-1');   //user not found
-				return
+				res.send(JSON.stringify(-1));   //user not found
+				return;
 			}
 			
 			if (password != rows[0].password) {
-				res.send('-2');     //password error
-				return
+				res.send(JSON.stringify(-2));     //password error
+				return;
 			}
 			
 			callBack(rows[0].id);
-		})
+		});
+		
+		// dbDriver.execQuery(sql, )
+	};
+	
+	this.authById = function (shopId, password, dbShop, res, callBack) {
+		dbShop.find({ id: shopId }).only('password').run(function (err, rows) {
+			if (err) {
+				res.send(JSON.stringify(0));    //internal error
+				return;
+			}
+			
+			if (rows.length == 0) {
+				res.send(JSON.stringify(-1));   //user not found
+				return;
+			}
+			
+			if (rows[0].del == 1) {
+				res.send(JSON.stringify(-9));
+				return;
+			}
+			// console.log(rows[0].password);
+			if (password != rows[0].password) {
+				res.send(JSON.stringify(-2));     //password error
+				return;
+			}
+			
+			callBack()
+		});
 	};
 	
 	//账户是否存在
 	this.isExist = function (id, dbShop, res, callBack) {
 		dbShop.exists({ id: id }, function (err, isExist) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(isExist)
-		})
+		});
 	};
 	
 	//名称是否存在
 	this.nameIsExist = function (name, dbShop, res, callBack) {
 		dbShop.exists({ name: name }, function (err, bool) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(bool)
-		})
+		});
 	};
 	
 	//返回所有shop信息
 	this.all = function (dbShop, res, callBack) {
 		dbShop.find(function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//注册
@@ -98,8 +142,8 @@ function Shop() {
 		
 		dbDriver.execQuery(sql, function (err, result) {
 			if (err || result.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			console.log(result);
@@ -126,24 +170,24 @@ function Shop() {
 					//数据库插入路径
 					dbShop.find({ id: shopId }, function (err, rows) {
 						if (err || rows.length == 0) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
 						rows[0].img = uploadPath + imgPath + imgName;
 						rows[0].certificate = uploadPath + certPath + certName;
 						rows[0].save(function (err) {
 							if (err) {
-								res.send('0');
-								return
+								res.send(JSON.stringify(0));
+								return;
 							}
 							
 							callBack(shopId)
-						})
-					})
-				})
-			})
-		})
+						});
+					});
+				});
+			});
+		});
 	};
 	
 	//更新信息
@@ -153,8 +197,8 @@ function Shop() {
 		//查找要修改的shop
 		dbShop.find({ id: shopId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			//处理图片
@@ -188,27 +232,27 @@ function Shop() {
 					
 					row.save(function (err) {
 						if (err) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
-						res.send('1');
+						res.send(JSON.stringify(1));
 						
 						if (callBack) {
 							callBack();
 						}
-					})
-				})
-			})
-		})
+					});
+				});
+			});
+		});
 	};
 	
 	//根据id获取信息
-	this.getById = function (id, dbShop, res, callBack) {
+	this.getInfoById = function (id, dbShop, res, callBack) {
 		dbShop.find({ id: id }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows[0])
@@ -216,14 +260,14 @@ function Shop() {
 	};
 	
 	//根据名称获取信息
-	this.getByName = function (name, dbShop, res, callBack) {
+	this.getInfoByName = function (name, dbShop, res, callBack) {
 		dbShop.find({ name: name }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
+			callBack(rows);
 		});
 	};
 	
@@ -238,12 +282,12 @@ function Shop() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows);
-		})
+		});
 	};
 	
 	//范围内获取餐厅
@@ -255,36 +299,36 @@ function Shop() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//封禁/删除
 	this.del = function (shopId, dbShop, res, callBack) {
 		dbShop.find({ id: shopId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			//设置del为1, 表示被封禁
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
+				res.send(JSON.stringify(1));
 				
 				if (callBack) {
 					callBack();
 				}
-			})
+			});
 		});
 	};
 	
@@ -292,24 +336,24 @@ function Shop() {
 	this.activate = function (shopId, dbShop, res, callBack) {
 		dbShop.find({ id: shopId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			//设置del为0, 表示已激活
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
+				res.send(JSON.stringify(1));
 				
 				if (callBack) {
 					callBack();
 				}
-			})
+			});
 		});
 	};
 	

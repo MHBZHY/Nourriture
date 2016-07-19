@@ -11,13 +11,13 @@ function Order() {
 
 		connection.query(sql, function (err, rows) {
 			if (err) {
-				return
+				return;
 			}
 
 			if (callBack != undefined) {
-				callBack(rows)
+				callBack(rows);
 			}
-		})
+		});
 	};
 
 	this.searchWithId = function (userId, res, callBack) {
@@ -25,13 +25,13 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return
+				return;
 			}
 
 			if (callBack != undefined) {
 				callBack()
 			}
-		})
+		});
 	};
 
 	this.finish = function (menuId, res, callBack) {
@@ -39,13 +39,13 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return
+				return;
 			}
 
 			if (callBack != undefined) {
 				callBack()
 			}
-		})
+		});
 	};
 
 	this.cancel = function (menuId, res, callBack) {
@@ -53,13 +53,13 @@ function Order() {
 
 		connection.query(sql, function (err) {
 			if (err) {
-				return
+				return;
 			}
 
 			if (callBack != undefined) {
 				callBack()
 			}
-		})
+		});
 	}
 }
 

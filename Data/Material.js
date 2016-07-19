@@ -16,8 +16,8 @@ function Material() {
 			del: 0
 		}, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			//materialId
@@ -38,18 +38,14 @@ function Material() {
 				row.img = uploadPath + newPath + newFileName;
 				row.save(function (err) {
 					if (err) {
-						res.send('0');
-						return
+						res.send(JSON.stringify(0));
+						return;
 					}
 					
-					res.send('1');
-					
-					if (callBack) {
-						callBack(materialId)
-					}
-				})
-			})
-		})
+					callBack(materialId)
+				});
+			});
+		});
 	};
 	
 	//添加至菜单
@@ -59,12 +55,12 @@ function Material() {
 			menu_id: menuId
 		}, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack()
-		})
+		});
 	};
 	
 	//修改原料
@@ -74,8 +70,8 @@ function Material() {
 			//寻找原料
 			req.models.material.find({ id: fields.id[0] }, function (err, rows) {
 				if (err || rows.length == 0) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
 				//图片路径
@@ -97,19 +93,15 @@ function Material() {
 					//保存
 					row.save(function (err) {
 						if (err) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
-						res.send('1');
-						
-						if (callBack) {
-							callBack();
-						}
-					})
-				})
-			})
-		})
+						callBack()
+					});
+				});
+			});
+		});
 	};
 	
 	//从菜单中删除原料
@@ -119,16 +111,12 @@ function Material() {
 			menu_id: params.menuId
 		}).remove(function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			res.send('1');
-			
-			if (callBack) {
-				callBack()
-			}
-		})
+			callBack()
+		});
 	};
 	
 	//向菜单中添加现成的原料
@@ -138,64 +126,52 @@ function Material() {
 			menu_id: params.menuId
 		}, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			res.send('1');
-			
-			if (callBack) {
-				callBack()
-			}
-		})
+			callBack()
+		});
 	};
 	
 	//封禁
 	this.del = function (materialId, dbMaterial, res, callBack) {
 		dbMaterial.find({ id: materialId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			rows[0].del = 1;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
-				
-				if (callBack) {
-					callBack()
-				}
-			})
-		})
+				callBack()
+			});
+		});
 	};
 	
 	//激活
 	this.activate = function (materialId, dbMaterial, res, callBack) {
 		dbMaterial.find({ id: materialId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			rows[0].del = 0;
 			rows[0].save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
-				
-				if (callBack) {
-					callBack()
-				}
-			})
-		})
+				callBack()
+			});
+		});
 	}
 }
 

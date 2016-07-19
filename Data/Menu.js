@@ -7,6 +7,7 @@ function Menu() {
 	var connection = require('../DB_Class').getConnection();
 	var file = require('../Service/File');
 	var user = require('./User');
+	var tool = require('../Service/Tools');
 	
 	var uploadPath = '/upload';
 	
@@ -22,8 +23,8 @@ function Menu() {
 			del: 0
 		}, function (err, row) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			//插入时创建的id
@@ -42,23 +43,23 @@ function Menu() {
 				//将图片路径插入数据库
 				dbMenu.find({id: menuId}, function (err, rows) {
 					if (err || rows.length == 0) {
-						res.send('0');
-						return
+						res.send(JSON.stringify(0));
+						return;
 					}
 					
 					//插入路径
 					rows[0].img = uploadPath + imgPath + imgName;
 					rows[0].save(function (err) {
 						if (err) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
 						callBack(menuId)
-					})
-				})
-			})
-		})
+					});
+				});
+			});
+		});
 	};
 	
 	this.bindWithUser = function (dbMenu_Shop_User, menuId, userId, res, callBack) {
@@ -68,12 +69,12 @@ function Menu() {
 			user_id: userId
 		}, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack()
-		})
+		});
 	};
 	
 	this.getTypeListWithShopId = function (shopId, dbDriver, res, callBack) {
@@ -86,12 +87,12 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	this.bindWithShop = function (dbMenu_Shop_User, menuId, shopId, res, callBack) {
@@ -101,12 +102,12 @@ function Menu() {
 			shop_id: shopId
 		}, function (err) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack()
-		})
+		});
 	};
 	
 	this.all = function (dbMenu, res, callBack) {
@@ -116,46 +117,46 @@ function Menu() {
 		
 		dbMenu.find({ del: 0 }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	this.allWithPageMode = function (dbMenu, page, amount, res, callBack) {
 		dbMenu.find({ del: 0 }).limit(amount).offset(page).run(function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//获取单个菜单
-	this.getById = function (menuId, dbMenu, res, callBack) {
+	this.getInfoById = function (menuId, dbMenu, res, callBack) {
 		dbMenu.find({ id: menuId, del: 0 }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			callBack(rows[0])
-		})
+		});
 	};
 	
-	this.getByName = function (name, dbMenu, res, callBack) {
+	this.getInfoByName = function (name, dbMenu, res, callBack) {
 		dbMenu.find({ name: name, del: 0 }, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
-			
+
 			callBack(rows[0])
-		})
+		});
 	};
 	
 	//获取用户自己的菜单
@@ -168,13 +169,13 @@ function Menu() {
 			
 			dbDriver.execQuery(sql, function (err, rows) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				callBack(rows)
-			})
-		})
+				callBack(rows);
+			});
+		});
 	};
 	
 	this.getByUserId = function (id, dbDriver, res, callBack) {
@@ -185,12 +186,12 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//获取餐厅自己的菜单
@@ -202,12 +203,12 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//todo: 分页返回商家菜单
@@ -223,12 +224,12 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//获取餐厅菜单(按分类)
@@ -243,12 +244,12 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	this.getByShopWithTypePageMode = function (shopId, type, page, amount, dbDriver, res, callBack) {
@@ -266,12 +267,49 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
+	};
+	
+	this.search = function (name, shopId, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE msu.shop_id={shopId} AND menu.id=msu.menu_id AND menu.name LIKE "%{name}%"'.format({
+				shopId: shopId,
+				name: name
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send(JSON.stringify(0));
+				return;
+			}
+			
+			callBack(rows);
+		});
+	};
+	
+	this.searchWithType = function (name, type, shopId, dbDriver, res, callBack) {
+		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
+			'WHERE msu.shop_id={shopId} AND menu.id=msu.menu_id AND menu.name LIKE "%{name}%" AND menu.type="{type}"'.format({
+				shopId: shopId, name: name, type: type
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send(JSON.stringify(0));
+				return;
+			}
+			
+			callBack(rows);
+		});
 	};
 	
 	//获取一定范围菜单
@@ -280,11 +318,11 @@ function Menu() {
 		
 		connection.query(sql, function (err, rows) {
 			if (err) {
-				return
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	//更新菜单
@@ -304,8 +342,8 @@ function Menu() {
 				//根据id寻找菜单
 				req.models.menu.find({ id: fields.id[0] }, function (err, rows) {
 					if (err || rows.length == 0) {
-						res.send('0');
-						return
+						res.send(JSON.stringify(0));
+						return;
 					}
 					
 					//修改数据
@@ -318,19 +356,19 @@ function Menu() {
 					row.img = uploadPath + imgPath + imgName;
 					row.save(function (err) {
 						if (err) {
-							res.send('0');
-							return
+							res.send(JSON.stringify(0));
+							return;
 						}
 						
-						res.send('1');
+						res.send(JSON.stringify(1));
 						
 						if (callBack) {
 							callBack()
 						}
-					})
-				})
-			})
-		})
+					});
+				});
+			});
+		});
 	};
 	
 	//评价菜单
@@ -338,8 +376,8 @@ function Menu() {
 		//寻找用户
 		dbUser.find({ device_id: params.deviceId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			var userId = rows[0].id;
@@ -352,17 +390,17 @@ function Menu() {
 				score: params.score
 			}, function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
+				res.send(JSON.stringify(1));
 				
 				if (callBack) {
 					callBack()
 				}
-			})
-		})
+			});
+		});
 	};
 	
 	//获得评价
@@ -377,19 +415,19 @@ function Menu() {
 		
 		dbDriver.execQuery(sql, function (err, rows) {
 			if (err) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
-			callBack(rows)
-		})
+			callBack(rows);
+		});
 	};
 	
 	this.del = function (menuId, dbMenu, res, callBack) {
 		dbMenu.find({ id: menuId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			var row = rows[0];
@@ -397,24 +435,24 @@ function Menu() {
 			row.del = 1;
 			row.save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
+				res.send(JSON.stringify(1));
 				
 				if (callBack) {
 					callBack()
 				}
-			})
-		})
+			});
+		});
 	};
 	
 	this.activate = function (menuId, dbMenu, res, callBack) {
 		dbMenu.find({ id: menuId }, function (err, rows) {
 			if (err || rows.length == 0) {
-				res.send('0');
-				return
+				res.send(JSON.stringify(0));
+				return;
 			}
 			
 			var row = rows[0];
@@ -422,17 +460,17 @@ function Menu() {
 			row.del = 0;
 			row.save(function (err) {
 				if (err) {
-					res.send('0');
-					return
+					res.send(JSON.stringify(0));
+					return;
 				}
 				
-				res.send('1');
+				res.send(JSON.stringify(1));
 				
 				if (callBack) {
 					callBack()
 				}
-			})
-		})
+			});
+		});
 	}
 }
 
