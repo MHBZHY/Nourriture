@@ -36,6 +36,9 @@ app.use(function (req, res, next) {
     next();
 });
 
+//设置一些扩展函数
+require('./Service/Tools').stringFormat();
+
 //orm操作数据库(实验中)
 require('./DB_ORM2').createOrmConnection(app);
 
@@ -47,12 +50,9 @@ app.engine('.html', require('ejs').__express);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/Public/view');
 
-//设置一些扩展函数
-require('./Service/Tools').stringFormat();
-
 //注册post处理
-// require('./Service/Routing').parse(app);
-require('./Service/RoutingTest').router(app);
+require('./Service/Routing').parse(app);
+// require('./Service/RoutingTest').router(app);
 
 //启动服务器
 app.listen(8088, function () {

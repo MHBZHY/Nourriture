@@ -149,7 +149,7 @@ function Material() {
 					return;
 				}
 				
-				callBack()
+				callBack();
 			});
 		});
 	};
@@ -169,7 +169,7 @@ function Material() {
 					return;
 				}
 				
-				callBack()
+				callBack();
 			});
 		});
 	}

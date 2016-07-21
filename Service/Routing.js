@@ -95,12 +95,12 @@ module.exports.parse = function (app) {
 	
 	//菜单分类
 	app.post('/menu_type', urlEncodedParser, function (req, res) {
-		service.menuType(req, res)
+		service.menuType(req, res);
 	});
 	
 	//搜索建议
 	app.post('/menu_search', urlEncodedParser, function (req, res) {
-		
+		service.menuSearch(req, res);
 	});
 	
 	//上传菜单

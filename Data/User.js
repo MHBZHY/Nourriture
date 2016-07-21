@@ -12,7 +12,7 @@ function User() {
 	
 	// 验证密码, 返回id
 	this.authByName = function (params, dbDriver, res, callBack) {
-		var sql = 'select id, password from user where ' +
+		var sql = 'select id, password, del from user where ' +
 			'name="{name}"'.format({
 				name: params.name
 			});
@@ -30,6 +30,11 @@ function User() {
 				return;
 			}
 			
+			if (rows[0].del == 1) {
+				res.send(JSON.stringify(-9));   //user not found
+				return;
+			}
+			
 			if (rows[0].password != params.password) {
 				res.send(JSON.stringify(-2));   //password error
 				return;
@@ -40,7 +45,7 @@ function User() {
 	};
 	
 	this.authByPhone = function (params, dbDriver, res, callBack) {
-		var sql = 'select id, password from user where ' +
+		var sql = 'select id, password, del from user where ' +
 			'phone="{phone}"'.format({
 				phone: params.phone
 			});
@@ -55,6 +60,11 @@ function User() {
 			
 			if (rows.length == 0) {
 				res.send(JSON.stringify(-1));   //user not found
+				return;
+			}
+			
+			if (rows[0].del == 1) {
+				res.send(JSON.stringify(-9));   //user not found
 				return;
 			}
 			
@@ -74,7 +84,7 @@ function User() {
 			password: params.password,
 			phone: params.phone,
 			del: 0
-		}, function (err, rows) {
+		}, function (err, result) {
 			if (err) {
 				res.send(JSON.stringify(0));
 				return;
@@ -82,7 +92,7 @@ function User() {
 			
 			// console.log(rows);
 			
-			callBack(rows[0].id)
+			callBack(result.id)
 		});
 	};
 	
@@ -130,45 +140,44 @@ function User() {
 	};
 	
 	//更新信息
-	this.update = function (req, res, callBack) {
-		file.parse(req, res, function (fields, files) {
-			//得到用户id
-			req.models.user.find({ device_id: fields.deviceId[0] }, function (err, rows) {
-				if (err || rows.length == 0) {
-					res.send(JSON.stringify(0));
-					return;
-				}
+	this.update = function (dbUser, fields, files, res, callBack) {
+		//得到用户id
+		req.models.user.find({ device_id: fields.deviceId[0] }, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send(JSON.stringify(0));
+				return;
+			}
+			
+			//userId
+			var userId = rows[0].id;
+			
+			//图片路径
+			var newUserPath = '/user/{id}'.format({
+				id: userId
+			});
+			var newFileName = '/face{ext}'.format({
+				ext: file.getFileType(files.img[0].originalFilename)
+			});
+			
+			file.move(files.img[0].path, newUserPath, newFileName, res, function () {
+				//修改数据
+				var row = rows[0];
 				
-				//userId
-				var userId = rows[0].id;
+				row.name = fields.name[0];
+				row.phone = fields.phone[0];
+				row.img = uploadPath + newUserPath + newFileName;
+				//可选数据
+				row.birthday = (fields.birthday && fields.birthday[0]) ? fields.birthday[0] : null;
+				row.mail = (fields.mail && fields.mail[0]) ? fields.mail[0] : null;
+				row.sex = (fields.sex && fields.sex[0]) ? fields.sex[0] : null;
 				
-				//图片路径
-				var newUserPath = '/user/{id}'.format({
-					id: userId
-				});
-				var newFileName = '/face{ext}'.format({
-					ext: file.getFileType(files.img[0].originalFilename)
-				});
-				
-				file.move(files.img[0].path, newUserPath, newFileName, res, function () {
-					//修改数据
-					var row = rows[0];
+				row.save(function (err) {
+					if (err) {
+						res.send(JSON.stringify(0));
+						return;
+					}
 					
-					row.name = fields.name[0];
-					row.phone = fields.phone[0];
-					row.img = uploadPath + newUserPath + newFileName;
-					//可选数据
-					row.birthday = (fields.birthday && fields.birthday[0]) ? fields.birthday[0] : null;
-					row.mail = (fields.mail && fields.mail[0]) ? fields.mail[0] : null;
-					row.sex = (fields.sex && fields.sex[0]) ? fields.sex[0] : null;
-					row.save(function (err) {
-						if (err) {
-							res.send(JSON.stringify(0));
-							return;
-						}
-						
-						callBack()
-					});
+					callBack();
 				});
 			});
 		});
@@ -194,7 +203,7 @@ function User() {
 	};
 	
 	this.getIdByDeviceId = function (deviceId, dbDriver, res, callBack) {
-		var sql = 'SELECT id FROM user WHERE device_id={id}'.format({
+		var sql = 'SELECT id FROM user WHERE device_id="{id}" AND del=0'.format({
 			id: deviceId
 		});
 		
@@ -209,7 +218,8 @@ function User() {
 				return;
 			}
 			
-			callBack(rows[0].id)
+			console.log(rows);
+			callBack(rows[0].id);
 		});
 	};
 	
@@ -297,7 +307,7 @@ function User() {
 	};
 	
 	//范围内查找好友
-	this.friendInBound = function (params, dbDriver, res, callBack) {
+	this.friendInBound = function (userId, location, distance, dbDriver, res, callBack) {
 		var sql = '';
 		
 		console.log(sql);
@@ -332,7 +342,7 @@ function User() {
 					return;
 				}
 				
-				callBack()
+				callBack();
 			});
 		});
 	};
@@ -357,7 +367,7 @@ function User() {
 					return;
 				}
 				
-				callBack()
+				callBack();
 			});
 		});
 	};

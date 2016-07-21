@@ -7,7 +7,7 @@ module.exports.stringFormat = function () {
 			var result = this;
 			if (arguments.length == 1 && typeof (args) == "object") {
 				for (var key in args) {
-					var reg = new RegExp("({" + key + "});", "g");
+					var reg = new RegExp("({" + key + "})", "g");
 					result = result.replace(reg, args[key]);
 				}
 			}
@@ -17,7 +17,7 @@ module.exports.stringFormat = function () {
 						return "";
 					}
 					else {
-						var reg = new RegExp("({[" + i + "]});", "g");
+						var reg = new RegExp("({[" + i + "]})", "g");
 						result = result.replace(reg, arguments[i]);
 					}
 				}

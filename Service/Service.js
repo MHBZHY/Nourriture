@@ -13,6 +13,7 @@ function Service() {
 	
 	/*
 	所有service均按照 管理员、移动端、web 的顺序进行控制
+	返回值-10: 尚未登陆
 	 */
 	
 	//登陆
@@ -23,6 +24,7 @@ function Service() {
 				req.session.admin = 1;
 				res.send(JSON.stringify(1));
 			});
+			
 			return;
 		}
 		
@@ -36,6 +38,7 @@ function Service() {
 						res.send(JSON.stringify(1));
 					});
 				});
+				
 				return;
 			}
 			
@@ -47,6 +50,7 @@ function Service() {
 					});
 				});
 			}
+			
 			return;
 		}
 		
@@ -62,15 +66,14 @@ function Service() {
 	
 	//名称是否已存在
 	this.regNameExist = function (req, res) {
-		//app
 		if (req.body.deviceId) {
 			user.nameIsExist(req.body.name, req.models.user, res, function () {
 				res.send(JSON.stringify(1))
 			});
+			
 			return;
 		}
 		
-		//web
 		shop.nameIsExist(req.body.name, req.models.shop, res, function () {
 			res.send(JSON.stringify(1))
 		});
@@ -79,7 +82,7 @@ function Service() {
 	//注册
 	this.userRegister = function (req, res) {
 		user.add(req.body, req.models.user, res, function (userId) {
-			res.send(JSON.stringify(userId))
+			res.send(JSON.stringify(1))
 		});
 	};
 	
@@ -93,13 +96,11 @@ function Service() {
 	
 	//注销
 	this.logout = function (req, res) {
-		//app
 		if (req.body.deviceId) {
 			user.logout(req.body.deviceId, req.db.driver, res);
 			return;
 		}
 		
-		//web and admin
 		shop.logout(req, function () {
 			if (req.session.sessionID) {
 				res.send(JSON.stringify(0))
@@ -112,13 +113,13 @@ function Service() {
 	
 	//获取用户信息
 	this.userInfo = function (req, res) {
-		//管理员
-		if (req.session.admin == 1) {
+		if (req.session.admin && req.session.admin == 1) {
 			//按id
 			if (req.body.id) {
 				user.getInfoById(req.body.id, req.models.user, res, function (rows) {
 					res.send(rows[0])
 				});
+				
 				return;
 			}
 			
@@ -127,6 +128,7 @@ function Service() {
 				user.getInfoByName(req.body.name, req.models.user, res, function (rows) {
 					res.send(rows[0])
 				});
+				
 				return;
 			}
 			
@@ -134,10 +136,10 @@ function Service() {
 			user.all(req.models.user, res, function (rows) {
 				res.send(rows);
 			});
+			
 			return;
 		}
 		
-		//app
 		if (req.body.deviceId) {
 			user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function () {
 				//若查询到此deviceId, 则继续执行
@@ -153,26 +155,33 @@ function Service() {
 					res.send(rows);
 				});
 			});
+			
+			return;
 		}
 		
 		//普通web端无权获取用户信息
+		//未登录
+		res.send(JSON.stringify(-10));
 	};
 	
 	//获取餐厅信息
 	this.shopInfo = function (req, res) {
-		//管理员
-		if (req.session.admin == 1) {
+		if (req.session.admin && req.session.admin == 1) {
+			//按id获取餐厅信息
 			if (req.body.id) {
 				shop.getInfoById(req.body.id, req.models.shop, res, function (rows) {
 					res.send(rows[0])
 				});
+				
 				return;
 			}
 			
+			//按名称获取餐厅信息
 			if (req.body.name) {
 				shop.getInfoByName(req.body.name, req.models.shop, res, function (rows) {
 					res.send(rows[0])
 				});
+				
 				return;
 			}
 			
@@ -180,86 +189,100 @@ function Service() {
 			shop.all(req.models.shop, res, function (rows) {
 				res.send(rows);
 			});
+			
 			return;
 		}
 		
-		//app
 		if (req.body.deviceId) {
+			//按id获取餐厅信息
 			if (req.body.id) {
 				shop.getInfoById(req.body.id, req.models.shop, res, function (rows) {
 					res.send(rows);
 				});
+				
 				return;
 			}
 			
+			//按名称获取餐厅信息
+			//预计不会使用
 			if (req.body.name) {
 				shop.getInfoByName(req.body.name, req.models.shop, res, function (rows) {
 					res.send(rows);
 				});
 			}
+			
 			return;
 		}
 		
-		//web
 		//todo: change to req.session.shopId
+		//按已登陆的的id获取自己餐厅的信息
 		if (req.body.id) {
 			shop.getInfoById(req.body.id, req.models.shop, res, function (row) {
 				console.log(row);
 				res.send(row)
 			});
+			
 			return;
 		}
 		
+		//未登录
 		res.send(JSON.stringify(-10))
 	};
 	
 	//更新用户信息
 	this.userUpdate = function (req, res) {
-		user.update(req, res, function () {
-			res.send(JSON.stringify(1))
+		file.parse(req, res, function (fields, files) {
+			user.update(req.models.user, fields, files, res, function () {
+				res.send(JSON.stringify(1));
+			});
 		});
 	};
 	
 	//获取菜单
 	this.menuInfo = function (req, res) {
-		//管理员
 		if (req.session.admin && req.session.admin == 1) {
 			if (req.body.menuId) {
 				menu.getInfoById(req.body.menuId, req.models.menu, res, function (row) {
-					res.send(row)
+					res.send(row);
 				});
 			}
 			
 			if (req.body.name) {
 				menu.getInfoByName(req.body.name, req.models.menu, res, function (row) {
-					res.send(row)
+					res.send(row);
 				});
+				
 				return;
 			}
 			
 			//获取所有菜单
-			menu.all(req.models.menu, res, function (rows) {
+			// menu.all(req.models.menu, res, function (rows) {
+			// 	res.send(rows);
+			// });
+			menu.adminAll(req.models.menu, res, function (rows) {
 				res.send(rows);
 			});
+			
 			return;
 		}
 		
-		//app
 		if (req.body.deviceId) {
-			user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function () {
+			user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function (userId) {
 				//获取单个菜单
 				if (req.body.menuId) {
 					menu.getInfoById(req.body.menuId, req.models.menu, res, function (row) {
-						res.send(row)
+						res.send(row);
 					});
+					
 					return;
 				}
 				
 				//获取商店菜单 分页
 				if (req.body.shopId) {
-					menu.getByShopPageMode(req.body.id, req.body.page, req.body.amount, req.db.driver, res, function (rows) {
+					menu.getByShopPageMode(req.body.shopId, req.body.page, req.body.amount, req.db.driver, res, function (rows) {
 						res.send(rows);
 					});
+					
 					return;
 				}
 				
@@ -268,13 +291,11 @@ function Service() {
 				
 				//获取推荐菜单(其实就是所有菜单。。。)按分页
 				if (req.body.page && req.body.amount) {
-					// menu.all(req.models.menu, res, function (rows) {
-					// 	res.send(rows);
-					// });
 					menu.allWithPageMode(req.models.menu, req.body.page, req.body.amount, res, function (rows) {
 						console.log(rows);
 						res.send(rows);
 					});
+					
 					return;
 				}
 				
@@ -283,11 +304,12 @@ function Service() {
 					res.send(rows);
 				});
 			});
+			
 			return;
 		}
 		
-		//web
 		//todo: change to req.session.shopId
+		// if (req.session.shopId) {
 		if (req.body.id) {
 			//根据类别
 			if (req.body.type) {
@@ -296,14 +318,16 @@ function Service() {
 					menu.searchWithType(req.body.name, req.body.type, req.body.id, req.db.driver, res, function (rows) {
 						res.send(rows);
 					});
+					
 					return;
 				}
 				
 				//按类别返回
-				menu.getByShopWithType(req.body.id, req.body.type, req.db.driver, res, function (rows) {
-					console.log(rows);
-					res.send(rows);
+				menu.getByShopWithType(req.body.id, req.body.type, req.db.driver, res, function (result) {
+					console.log(result);
+					res.send(result);
 				});
+				
 				return;
 			}
 			
@@ -314,14 +338,15 @@ function Service() {
 					console.log(rows);
 					res.send(rows);
 				});
+				
 				return;
 			}
 			
-			//todo: 分页返回
-			menu.getByShop(req.body.id, req.db.driver, res, function (rows) {
-				console.log(rows);
-				res.send(rows);
+			//分页返回餐厅菜单
+			menu.getByShopPageMode(req.body.id, req.body.page, req.body.amount, req.db.driver, res, function (result) {
+				res.send(result);
 			});
+			
 			return;
 		}
 		
@@ -330,7 +355,8 @@ function Service() {
 	
 	//菜单分类
 	this.menuType = function (req, res) {
-		//todo: 权限控制
+		// res.send("[{\"type\":\"a\"}]");
+		//todo: 权限控制, session.shopId
 		menu.getTypeListWithShopId(req.body.id, req.db.driver, res, function (rows) {
 			console.log(rows);
 			res.send(rows);
@@ -346,6 +372,7 @@ function Service() {
 				menu.getByUserId(req.body.id, req.db.driver, res, function (rows) {
 					res.send(rows);
 				});
+				
 				return;
 			}
 			
@@ -360,7 +387,6 @@ function Service() {
 	this.menuAdd = function (req, res) {
 		//parse
 		file.parse(req, res, function (fields, files) {
-			//app
 			if (fields.deviceId && fields.deviceId[0]) {
 				//get id
 				user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function (userId) {
@@ -368,14 +394,14 @@ function Service() {
 					menu.add(req.models.menu, req.models.menu_shop_user, fields, files, res, function (menuId) {
 						//bind
 						menu.bindWithUser(req.models.menu_shop_user, menuId, userId, res, function () {
-							res.send(JSON.stringify(menuId))
+							res.send(JSON.stringify(menuId));
 						});
 					});
 				});
+				
 				return;
 			}
 			
-			//web
 			//todo: change to req.session.shopId
 			if (fields.id) {
 				menu.add(req.models.menu, req.models.menu_shop_user, fields, files, res, function (menuId) {
@@ -383,40 +409,52 @@ function Service() {
 						res.send(JSON.stringify(menuId))
 					});
 				});
+				
 				return;
 			}
 			
-			res.send(JSON.stringify(-10))
+			res.send(JSON.stringify(-10));
 		});
+	};
+	
+	this.menuSearch = function (req, res) {
+		if (req.body.deviceId) {
+			menu.searchSuggest(req.db.driver, req.body.name, res, function (rows) {
+				res.send(rows);
+			});
+		}
 	};
 	
 	//修改菜单
 	this.menuUpdate = function (req, res) {
-		//app
 		if (req.body.deviceId) {
 			user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function () {
-				menu.updateById(req, res)
+				menu.updateById(req, res);
 			});
+			
 			return;
 		}
 		
-		//web
 		if (req.session.shopId) {
 			menu.updateById(req, res);
 			return;
 		}
 		
-		res.send(JSON.stringify(-10))
+		res.send(JSON.stringify(-10));
 	};
 	
 	//删除菜单
 	this.menuDel = function (req, res) {
-		
+		menu.del(req.body.id, req.models.menu, res, function () {
+			res.send(JSON.stringify(1));
+		});
 	};
 	
 	//点评菜单
 	this.menuEvaluate = function (req, res) {
-		menu.evaluate(req.body, req.models.menu_evaluate, req.models.user, res)
+		menu.evaluate(req.body, req.models.menu_evaluate, req.models.user, res, function () {
+			res.send(JSON.stringify(1));
+		});
 	};
 	
 	//餐厅搜索建议
@@ -436,16 +474,25 @@ function Service() {
 	
 	//发布消息
 	this.ads = function (req, res) {
-		//todo: 权限控制
-		shop.addAds(req.body.id, req.body.ads, req.models.shop, res, function () {
-			res.send(JSON.stringify(1))
-		});
+		//todo: change to req.session.shopId
+		// if (req.session.shopId) {
+		if (req.body.id) {
+			shop.addAds(req.body.id, req.body.ads, req.models.shop, res, function () {
+				res.send(JSON.stringify(1))
+			});
+			
+			return;
+		}
+		
+		res.send(JSON.stringify(-10));
 	};
 	
 	//获取附近好友
 	this.friendInBound = function (req, res) {
-		user.friendInBound(req.body, req.db.driver, res, function (rows) {
-			res.send(rows);
+		user.getIdByDeviceId(req.body.deviceId, req.db.driver, res, function (userId) {
+			user.friendInBound(userId, req.body.location, req.body.distance, req.db.driver, res, function (rows) {
+				res.send(rows);
+			});
 		});
 	};
 	
@@ -509,30 +556,34 @@ function Service() {
 	};
 	
 	this.adminForbid = function (req, res) {
-		//0: 用户, 1: 商户, 2: 菜品
+		//0: 用户, 1: 商户, 2: 菜品, 4: 原料
 		switch (req.body.type) {
 			case '0':
 				user.del(req.body.id, req.models.user, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '1':
 				shop.del(req.body.id, req.models.shop, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '2':
 				menu.del(req.body.id, req.models.menu, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '3':
 				material.del(req.body.id, req.models.material, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			default:
@@ -545,26 +596,30 @@ function Service() {
 		switch (req.body.type) {
 			case '0':
 				user.activate(req.body.id, req.models.user, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '1':
 				shop.activate(req.body.id, req.models.shop, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '2':
 				menu.activate(req.body.id, req.models.menu, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			case '3':
 				material.activate(req.body.id, req.models.material, res, function () {
-					res.send(JSON.stringify(1))
+					res.send(JSON.stringify(1));
 				});
+				
 				break;
 			
 			default:
@@ -573,25 +628,22 @@ function Service() {
 	};
 	
 	this.material = function (req, res) {
-		//admin
 		if (req.session.admin && req.session.admin == 1) {
 			//todo: return all material
 			return;
 		}
 		
-		//app
 		if (req.body.deviceId) {
 			//todo: return all
 			return;
 		}
 		
-		//web
 		if (req.session.shopId) {
 			//todo: return all
 			return;
 		}
 		
-		res.send(JSON.stringify(-10))
+		res.send(JSON.stringify(-10));
 	}
 }
 

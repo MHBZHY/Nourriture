@@ -62,7 +62,7 @@ function Shop() {
 	};
 	
 	this.authById = function (shopId, password, dbShop, res, callBack) {
-		dbShop.find({ id: shopId }).only('password').run(function (err, rows) {
+		dbShop.find({ id: shopId }).only(['password', 'del']).run(function (err, rows) {
 			if (err) {
 				res.send(JSON.stringify(0));    //internal error
 				return;
@@ -72,7 +72,8 @@ function Shop() {
 				res.send(JSON.stringify(-1));   //user not found
 				return;
 			}
-			
+			console.log(rows);
+			console.log(rows[0].del);
 			if (rows[0].del == 1) {
 				res.send(JSON.stringify(-9));
 				return;
@@ -323,11 +324,7 @@ function Shop() {
 					return;
 				}
 				
-				res.send(JSON.stringify(1));
-				
-				if (callBack) {
-					callBack();
-				}
+				callBack();
 			});
 		});
 	};
@@ -348,11 +345,7 @@ function Shop() {
 					return;
 				}
 				
-				res.send(JSON.stringify(1));
-				
-				if (callBack) {
-					callBack();
-				}
+				callBack();
 			});
 		});
 	};

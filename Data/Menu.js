@@ -125,6 +125,21 @@ function Menu() {
 		});
 	};
 	
+	this.adminAll = function (dbMenu, res, callBack) {
+		//可返回菜单的属主
+		// var sql = 'SELECT name,img,price,description,type,del,score,msu.* FROM menu, menu_shop_user msu ' +
+		// 	'GROUP BY msu.menu_id';
+		
+		dbMenu.find(function (err, rows) {
+			if (err) {
+				res.send(JSON.stringify(0));
+				return;
+			}
+			
+			callBack(rows);
+		});
+	};
+	
 	this.allWithPageMode = function (dbMenu, page, amount, res, callBack) {
 		dbMenu.find({ del: 0 }).limit(amount).offset(page).run(function (err, rows) {
 			if (err) {
@@ -207,7 +222,27 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			var result = {};
+			
+			result.menus = rows;
+			
+			var sql = 'SELECT count(menu.id) FROM menu, menu_shop_user msu ' +
+				'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+					shopId: shopId
+				});
+			
+			dbDriver.execQuery(sql, function (err, row) {
+				if (err || rows.length == 0) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				console.log(row);
+				
+				result.count = row[0]['count(menu.id)'];
+				
+				callBack(result);
+			});
 		});
 	};
 	
@@ -218,8 +253,8 @@ function Menu() {
 				shopId: shopId
 			}) +
 			'limit {start},{end}'.format({
-				start: page * amount,
-				end: (page + 1) * amount
+				start: (page - 1) * amount,
+				end: page * amount
 			});
 		
 		dbDriver.execQuery(sql, function (err, rows) {
@@ -228,16 +263,34 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			var result = {};
+			
+			result.menus = rows;
+			
+			var sql = 'SELECT count(menu.id) FROM menu, menu_shop_user msu ' +
+				'WHERE menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+					shopId: shopId
+				});
+			
+			dbDriver.execQuery(sql, function (err, rows) {
+				if (err || rows.length == 0) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				result.count = rows[0]['count(menu.id)'];
+				
+				callBack(result);
+			});
 		});
 	};
 	
 	//获取餐厅菜单(按分类)
 	this.getByShopWithType = function (shopId, type, dbDriver, res, callBack) {
-		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
-			'WHERE menu.type={type} AND msu.shop_id={shopId} AND menu.del=0'.format({
-				type: type,
-				shopId: shopId
+		var sql = 'SELECT menu.*, count(menu.id) FROM menu, menu_shop_user msu ' +
+			'WHERE menu.type="{type}" AND menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+				shopId: shopId,
+				type: type
 			});
 		
 		console.log(sql);
@@ -248,19 +301,24 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			var result = {};
+			
+			result.menus = rows;
+			result.count = rows[0]['count(menu.id)'];
+			
+			callBack(result);
 		});
 	};
 	
 	this.getByShopWithTypePageMode = function (shopId, type, page, amount, dbDriver, res, callBack) {
 		var sql = 'SELECT menu.* FROM menu, menu_shop_user msu ' +
-			'WHERE menu.type={type} AND msu.shop_id={shopId} AND menu.del=0 '.format({
-				type: type,
-				shopId: shopId
+			'WHERE menu.type={type} AND menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+				shopId: shopId,
+				type: type
 			}) +
 			'limit {start},{end}'.format({
-				start: page * amount,
-				end: (page + 1) * amount
+				start: (page - 1) * amount,
+				end: page * amount
 			});
 		
 		console.log(sql);
@@ -271,7 +329,26 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			var result = {};
+			
+			result.menus = rows;
+			
+			var sql = 'SELECT count(menu.id) FROM menu, menu_shop_user msu ' +
+				'WHERE menu.type={type} AND menu.id=msu.menu_id AND msu.shop_id={shopId} AND menu.del=0 '.format({
+					shopId: shopId,
+					type: type
+				});
+			
+			dbDriver.execQuery(sql, function (err, rows) {
+				if (err || rows.length == 0) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				result.count = rows[0]['count(menu.id)'];
+				
+				callBack(result);
+			});
 		});
 	};
 	
@@ -290,7 +367,26 @@ function Menu() {
 				return;
 			}
 			
-			callBack(rows);
+			var result = {};
+			
+			result.menus = rows;
+			
+			var sql = 'SELECT count(menu.id) FROM menu, menu_shop_user msu ' +
+				'WHERE msu.shop_id={shopId} AND menu.id=msu.menu_id AND menu.name LIKE "%{name}%"'.format({
+					shopId: shopId,
+					name: name
+				});
+			
+			dbDriver.execQuery(sql, function (err, rows) {
+				if (err || rows.length == 0) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				result.count = rows[0]['count(menu.id)'];
+				
+				callBack(result);
+			});
 		});
 	};
 	
@@ -307,6 +403,44 @@ function Menu() {
 				res.send(JSON.stringify(0));
 				return;
 			}
+			
+			var result = {};
+			
+			result.menus = rows;
+			
+			var sql = 'SELECT count(menu.id) FROM menu, menu_shop_user msu ' +
+				'WHERE msu.shop_id={shopId} AND menu.id=msu.menu_id AND menu.name LIKE "%{name}%" AND menu.type="{type}"'.format({
+					shopId: shopId, name: name, type: type
+				});
+			
+			dbDriver.execQuery(sql, function (err, rows) {
+				if (err || rows.length == 0) {
+					res.send(JSON.stringify(0));
+					return;
+				}
+				
+				result.count = rows[0]['count(menu.id)'];
+				
+				callBack(result);
+			});
+		});
+	};
+	
+	this.searchSuggest = function (dbDriver, name, res, callBack) {
+		var sql = 'SELECT id, name FROM menu ' +
+			'WHERE name LIKE "%{name}%"'.format({
+				name: name
+			});
+		
+		console.log(sql);
+		
+		dbDriver.execQuery(sql, function (err, rows) {
+			if (err || rows.length == 0) {
+				res.send(JSON.stringify(0));
+				return;
+			}
+			
+			console.log(rows);
 			
 			callBack(rows);
 		});
@@ -439,11 +573,7 @@ function Menu() {
 					return;
 				}
 				
-				res.send(JSON.stringify(1));
-				
-				if (callBack) {
-					callBack()
-				}
+				callBack();
 			});
 		});
 	};
@@ -464,11 +594,7 @@ function Menu() {
 					return;
 				}
 				
-				res.send(JSON.stringify(1));
-				
-				if (callBack) {
-					callBack()
-				}
+				callBack();
 			});
 		});
 	}
