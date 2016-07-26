@@ -216,7 +216,7 @@ function Service() {
 		
 		//todo: change to req.session.shopId
 		//按已登陆的的id获取自己餐厅的信息
-		if (req.body.id) {
+		if (req.session.shopId) {
 			shop.getInfoById(req.body.id, req.models.shop, res, function (row) {
 				console.log(row);
 				res.send(row)
